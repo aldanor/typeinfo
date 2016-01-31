@@ -18,9 +18,9 @@ pub enum Type {
 
 #[derive(Clone, Debug)]
 pub struct Field {
-    ty: Type,
-    name: String,
-    offset: usize,
+    pub ty: Type,
+    pub name: String,
+    pub offset: usize,
 }
 
 impl Field {
