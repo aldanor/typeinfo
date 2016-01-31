@@ -32,6 +32,18 @@ impl Type {
             &Type::Compound(_, size) => size,
         }
     }
+
+    pub fn is_array(&self) -> bool {
+        if let &Type::Array(_, _) = self { true } else { false }
+    }
+
+    pub fn is_compound(&self) -> bool {
+        if let &Type::Compound(_, _) = self { true } else { false }
+    }
+
+    pub fn is_scalar(&self) -> bool {
+        !self.is_array() && !self.is_compound()
+    }
 }
 
 #[derive(Clone, Debug)]
