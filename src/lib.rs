@@ -66,7 +66,7 @@ macro_rules! impl_array {
     ($($n:expr),*$(,)*) => {
         $(
             impl<T: $crate::TypeInfo> $crate::TypeInfo for [T; $n] {
-                #[inline]
+                #[inline(always)]
                 fn type_info() -> $crate::Type {
                     $crate::Type::Array(
                         Box::new(<T as $crate::TypeInfo>::type_info()),
