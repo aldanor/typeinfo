@@ -1,24 +1,42 @@
 #![cfg_attr(feature = "nightly", feature(plugin))]
 #![cfg_attr(feature = "nightly", plugin(clippy))]
 
+/// POD (*plain old data*) type: scalar, fixed-size array or compound (struct).
+/// May be arbitrarily nested.
 #[derive(Clone, Debug)]
 pub enum Type {
+    /// 1-byte signed integer
     Int8,
+    /// 2-byte signed integer
     Int16,
+    /// 4-byte signed integer
     Int32,
+    /// 8-byte signed integer
     Int64,
+    /// pointer-sized signed integer
     ISize,
+    /// 1-byte unsigned integer
     UInt8,
+    /// 2-byte unsigned integer
     UInt16,
+    /// 3-byte unsigned integer
     UInt32,
+    /// 4-byte unsigned integer
     UInt64,
+    /// pointer-sized unsigned integer
     USize,
+    /// 4-byte floating-point number
     Float32,
+    /// 8-byte floating-point number
     Float64,
+    /// character type
     Char,
+    /// 1-byte boolean type
     Bool,
+    /// fixed-size array with POD elements
     Array(Box<Type>, usize),
-    Compound(Vec<Field>, usize)
+    /// compound type whose fields are POD
+    Compound(Vec<Field>, usize),
 }
 
 impl Type {
@@ -53,10 +71,14 @@ impl Type {
     }
 }
 
+/// Field of a compound type: type, name and offset from the beginning of the struct.
 #[derive(Clone, Debug)]
 pub struct Field {
+    /// field value type
     pub ty: Type,
+    /// field name
     pub name: String,
+    /// offset to the beginning of the struct
     pub offset: usize,
 }
 
@@ -71,7 +93,8 @@ impl Field {
     }
 }
 
-pub trait TypeInfo : Copy {
+pub trait TypeInfo: Copy {
+    /// Returns the runtime type information for the implementing type.
     fn type_info() -> Type;
 }
 
