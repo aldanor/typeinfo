@@ -19,6 +19,7 @@ pub enum Type {
 }
 
 impl Type {
+    /// Returns the total size of a type value in bytes.
     pub fn size(&self) -> usize {
         match self {
             &Type::Int8 | &Type::UInt8 | &Type::Bool => 1,
@@ -33,16 +34,19 @@ impl Type {
         }
     }
 
+    /// Returns true if the underlying type is a scalar.
+    pub fn is_scalar(&self) -> bool {
+        !self.is_array() && !self.is_compound()
+    }
+
+    /// Returns true if the underlying type is a fixed-size array.
     pub fn is_array(&self) -> bool {
         if let &Type::Array(_, _) = self { true } else { false }
     }
 
+    /// Returns true if the underlying type is compound.
     pub fn is_compound(&self) -> bool {
         if let &Type::Compound(_, _) = self { true } else { false }
-    }
-
-    pub fn is_scalar(&self) -> bool {
-        !self.is_array() && !self.is_compound()
     }
 }
 
@@ -68,7 +72,7 @@ pub trait TypeInfo : Copy {
     fn type_info() -> Type;
 }
 
-macro_rules! impl_atomic {
+macro_rules! impl_scalar {
     ($t:ty, $i:ident) => (
         impl $crate::TypeInfo for $t {
             #[inline(always)]
@@ -79,20 +83,21 @@ macro_rules! impl_atomic {
     )
 }
 
-impl_atomic!(i8, Int8);
-impl_atomic!(i16, Int16);
-impl_atomic!(i32, Int32);
-impl_atomic!(i64, Int64);
-impl_atomic!(isize, ISize);
-impl_atomic!(u8, UInt8);
-impl_atomic!(u16, UInt16);
-impl_atomic!(u32, UInt32);
-impl_atomic!(u64, UInt64);
-impl_atomic!(usize, USize);
-impl_atomic!(f32, Float32);
-impl_atomic!(f64, Float64);
-impl_atomic!(char, Char);
-impl_atomic!(bool, Bool);
+// implement TypeInfo for built-iun scalar types
+impl_scalar!(i8, Int8);
+impl_scalar!(i16, Int16);
+impl_scalar!(i32, Int32);
+impl_scalar!(i64, Int64);
+impl_scalar!(isize, ISize);
+impl_scalar!(u8, UInt8);
+impl_scalar!(u16, UInt16);
+impl_scalar!(u32, UInt32);
+impl_scalar!(u64, UInt64);
+impl_scalar!(usize, USize);
+impl_scalar!(f32, Float32);
+impl_scalar!(f64, Float64);
+impl_scalar!(char, Char);
+impl_scalar!(bool, Bool);
 
 macro_rules! impl_array {
     ($($n:expr),*$(,)*) => {
@@ -110,6 +115,7 @@ macro_rules! impl_array {
     };
 }
 
+// implement TypeInfo for fixed-size arrays of lengths 0..63
 impl_array!(
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
     0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
@@ -123,6 +129,7 @@ impl_array!(
 
 #[macro_export]
 macro_rules! def {
+    // private struct, private fields
     ($($(#[$attr:meta])* struct $s:ident { $($i:ident: $t:ty),+$(,)* })*) => (
         $(
             #[allow(dead_code)]
@@ -133,6 +140,7 @@ macro_rules! def {
         )*
     );
 
+    // public struct, private fields
     ($($(#[$attr:meta])* pub struct $s:ident { $($i:ident: $t:ty),+$(,)* })*) => (
         $(
             #[allow(dead_code)]
@@ -143,6 +151,7 @@ macro_rules! def {
         )*
     );
 
+    // public struct, public fields
     ($($(#[$attr:meta])* pub struct $s:ident { $(pub $i:ident: $t:ty),+$(,)* })*) => (
         $(
             #[allow(dead_code)]
@@ -153,6 +162,7 @@ macro_rules! def {
         )*
     );
 
+    // implement TypeInfo trait
     (@impl $s:ident { $($i:ident: $t:ty),+ }) => (
         impl $crate::TypeInfo for $s {
             fn type_info() -> $crate::Type {
