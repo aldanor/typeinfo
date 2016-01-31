@@ -21,16 +21,16 @@ pub enum Type {
 impl Type {
     /// Returns the total size of a type value in bytes.
     pub fn size(&self) -> usize {
-        match self {
-            &Type::Int8 | &Type::UInt8 | &Type::Bool => 1,
-            &Type::Int16 | &Type::UInt16 => 2,
-            &Type::Int32 | &Type::UInt32 | &Type::Float32 => 4,
-            &Type::Int64 | &Type::UInt64 | &Type::Float64 => 8,
-            &Type::Char => ::std::mem::size_of::<char>(),
-            &Type::USize => ::std::mem::size_of::<usize>(),
-            &Type::ISize => ::std::mem::size_of::<isize>(),
-            &Type::Array(ref ty, num) => ty.size() * num,
-            &Type::Compound(_, size) => size,
+        match *self {
+            Type::Int8 | Type::UInt8 | Type::Bool => 1,
+            Type::Int16 | Type::UInt16 => 2,
+            Type::Int32 | Type::UInt32 | Type::Float32 => 4,
+            Type::Int64 | Type::UInt64 | Type::Float64 => 8,
+            Type::Char => ::std::mem::size_of::<char>(),
+            Type::USize => ::std::mem::size_of::<usize>(),
+            Type::ISize => ::std::mem::size_of::<isize>(),
+            Type::Array(ref ty, num) => ty.size() * num,
+            Type::Compound(_, size) => size,
         }
     }
 
@@ -41,12 +41,12 @@ impl Type {
 
     /// Returns true if the underlying type is a fixed-size array.
     pub fn is_array(&self) -> bool {
-        if let &Type::Array(_, _) = self { true } else { false }
+        if let Type::Array(_, _) = *self { true } else { false }
     }
 
     /// Returns true if the underlying type is compound.
     pub fn is_compound(&self) -> bool {
-        if let &Type::Compound(_, _) = self { true } else { false }
+        if let Type::Compound(_, _) = *self { true } else { false }
     }
 }
 
