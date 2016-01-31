@@ -15,7 +15,7 @@ pub enum Type {
     Char,
     Bool,
     Array(Box<Type>, usize),
-    Compound(Vec<Field>)
+    Compound(Vec<Field>, usize)
 }
 
 #[derive(Clone, Debug)]
@@ -135,7 +135,7 @@ macro_rules! def {
                         stringify!($i),
                         unsafe { &((*base).$i) as *const $t as usize}
                     )
-                ),*])
+                ),*], ::std::mem::size_of::<$s>())
             }
         }
     );
