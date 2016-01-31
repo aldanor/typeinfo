@@ -82,12 +82,11 @@ pub struct Field {
 }
 
 impl Field {
-    pub fn new<S, U>(ty: &Type, name: S, offset: U) -> Field
-    where S: Into<String>, U: Into<usize> {
+    pub fn new<S: Into<String>>(ty: &Type, name: S, offset: usize) -> Field {
         Field {
             ty: ty.clone(),
             name: name.into(),
-            offset: offset.into()
+            offset: offset
         }
     }
 }
