@@ -29,3 +29,16 @@ fn test_scalar_types() {
     check_scalar_type::<char>(Char);
 
 }
+
+#[test]
+fn test_array_types() {
+    let ty = <[u16; 42] as TypeInfo>::type_info();
+    assert_eq!(ty, Array(Box::new(UInt16), 42));
+    assert_eq!(ty.size(), 2 * 42);
+    assert!(ty.is_array() && !ty.is_scalar() && !ty.is_compound());
+
+    let ty = <[[i8; 2]; 3] as TypeInfo>::type_info();
+    assert_eq!(ty, Array(Box::new(Array(Box::new(Int8), 2)), 3));
+    assert_eq!(ty.size(), 1 * 2 * 3);
+    assert!(ty.is_array() && !ty.is_scalar() && !ty.is_compound());
+}

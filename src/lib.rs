@@ -29,7 +29,7 @@ pub enum Type {
     Float32,
     /// 8-byte floating-point number
     Float64,
-    /// character type
+    /// 4-byte unicode character type
     Char,
     /// 1-byte boolean type
     Bool,
