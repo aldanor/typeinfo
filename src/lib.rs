@@ -1,3 +1,6 @@
+#![cfg_attr(feature = "nightly", feature(plugin))]
+#![cfg_attr(feature = "nightly", plugin(clippy))]
+
 #[derive(Clone, Debug)]
 pub enum Type {
     Int8,
