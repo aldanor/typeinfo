@@ -5,8 +5,8 @@
 
 [Documentation](http://ivansmirnov.io/pod-typeinfo/pod_typeinfo/index.html)
 
-The `pod-typeinfo` crate provides access to type information for POD (plain old data)
-at runtime.
+The `pod-typeinfo` crate provides access to type information for POD (*plain old data*)
+types at runtime.
 
 ## License
 

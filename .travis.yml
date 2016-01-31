@@ -6,12 +6,12 @@ rust:
 - nightly
 script:
 - |
-  [ $TRAVIS_RUST_VERSION = "nightly" ] &&
-  cargo build --verbose && cargo test --verbose --features unstable
-- |
-  [ $TRAVIS_RUST_VERSION != "nightly" ] &&
-  cargo build --verbose && cargo test --verbose
-- cargo doc --no-deps
+  cargo build --verbose &&
+  case $TRAVIS_RUST_VERSION in
+    nightly)  cargo test --verbose --features unstable ;;
+    *)        cargo test --verbose ;;
+  esac &&
+  cargo doc --no-deps
 notifications:
   email:
     on_success: never
