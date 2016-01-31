@@ -3,7 +3,7 @@
 
 /// POD (*plain old data*) type: scalar, fixed-size array or compound (struct).
 /// May be arbitrarily nested.
-#[derive(Clone, Debug)]
+#[derive(Clone, PartialEq, Debug)]
 pub enum Type {
     /// 1-byte signed integer
     Int8,
@@ -72,7 +72,7 @@ impl Type {
 }
 
 /// Field of a compound type: type, name and offset from the beginning of the struct.
-#[derive(Clone, Debug)]
+#[derive(Clone, PartialEq, Debug)]
 pub struct Field {
     /// field value type
     pub ty: Type,
