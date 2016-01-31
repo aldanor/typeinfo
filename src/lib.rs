@@ -160,7 +160,7 @@ macro_rules! def {
             #[allow(dead_code)]
             #[derive(Clone, Copy)]
             $(#[$attr])*
-            struct $s { $($i: $t),* }
+            struct $s { $($i: $t),+ }
             def!(@impl $s { $($i: $t),+ } );
         )*
     );
@@ -171,7 +171,7 @@ macro_rules! def {
             #[allow(dead_code)]
             #[derive(Clone, Copy)]
             $(#[$attr])*
-            pub struct $s { $($i: $t),* }
+            pub struct $s { $($i: $t),+ }
             def!(@impl $s { $($i: $t),+ } );
         )*
     );
@@ -182,7 +182,7 @@ macro_rules! def {
             #[allow(dead_code)]
             #[derive(Clone, Copy)]
             $(#[$attr])*
-            pub struct $s { pub $($i: $t),* }
+            pub struct $s { pub $($i: $t),+ }
             def!(@impl $s { $($i: $t),+ } );
         )*
     );
@@ -198,7 +198,7 @@ macro_rules! def {
                         stringify!($i),
                         unsafe { &((*base).$i) as *const $t as usize}
                     )
-                ),*], ::std::mem::size_of::<$s>())
+                ),+], ::std::mem::size_of::<$s>())
             }
         }
     );
