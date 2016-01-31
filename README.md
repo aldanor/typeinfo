@@ -1,5 +1,8 @@
 # pod-typeinfo
 
+The `pod-typeinfo` crate provides access to type information for POD (plain old data)
+at runtime.
+
 ## License
 
 `pod-typeinfo` is primarily distributed under the terms of both the MIT license and
