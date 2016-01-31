@@ -18,6 +18,22 @@ pub enum Type {
     Compound(Vec<Field>, usize)
 }
 
+impl Type {
+    pub fn size(&self) -> usize {
+        match self {
+            &Type::Int8 | &Type::UInt8 | &Type::Bool => 1,
+            &Type::Int16 | &Type::UInt16 => 2,
+            &Type::Int32 | &Type::UInt32 | &Type::Float32 => 4,
+            &Type::Int64 | &Type::UInt64 | &Type::Float64 => 8,
+            &Type::Char => ::std::mem::size_of::<char>(),
+            &Type::USize => ::std::mem::size_of::<usize>(),
+            &Type::ISize => ::std::mem::size_of::<isize>(),
+            &Type::Array(ref ty, num) => ty.size() * num,
+            &Type::Compound(_, size) => size,
+        }
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct Field {
     pub ty: Type,
