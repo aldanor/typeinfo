@@ -51,6 +51,7 @@ fn test_compound_types() {
         Field::new(&Int32, "a", 0)
     ], mem::size_of::<X>()));
     assert_eq!(ty.size(), mem::size_of::<X>());
+    assert!(ty.is_compound() && !ty.is_scalar() && !ty.is_array());
 
     def![struct Y { a: u64, x: [X; 2] }];
     let ty = Y::type_info();
@@ -59,6 +60,7 @@ fn test_compound_types() {
         Field::new(&Array(Box::new(X::type_info()), 2), "x", 8),
     ], mem::size_of::<Y>()));
     assert_eq!(ty.size(), mem::size_of::<Y>());
+    assert!(ty.is_compound() && !ty.is_scalar() && !ty.is_array());
 }
 
 #[test]
@@ -85,11 +87,25 @@ mod module {
             y: i32
         }
     }
-
     def! {
         pub struct B {
             pub x: i32,
             pub y: i32
+        }
+    }
+
+    pub mod multiple {
+        def! {
+            struct C { x: i32 }
+            struct D { x: i32 }
+        }
+        def! {
+            pub struct E { x: i32 }
+            pub struct F { x: i32 }
+        }
+        def! {
+            pub struct G { pub x: i32 }
+            pub struct H { pub x: i32 }
         }
     }
 }
@@ -99,4 +115,5 @@ mod module {
 fn test_pub_structs_fields() {
     use module::{A, B};
     let b = B { x: 1, y: 2 };
+    use module::multiple::{E, F, G, H};
 }
