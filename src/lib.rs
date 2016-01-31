@@ -204,25 +204,3 @@ macro_rules! def {
     );
 }
 
-#[cfg(test)]
-pub mod tests {
-    use super::TypeInfo;
-
-    def! {
-        #[derive(Debug)]
-        pub struct Foo {
-            pub a: bool,
-            pub b: i32,
-        }
-
-        pub struct Bar {
-            pub foo: [Foo; 2],
-            pub s: f64
-        }
-    }
-
-    #[test]
-    fn test_smoke() {
-        println!("{:#?}", Bar::type_info());
-    }
-}
