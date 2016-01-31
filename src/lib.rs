@@ -86,7 +86,7 @@ macro_rules! impl_scalar {
     )
 }
 
-// implement TypeInfo for built-iun scalar types
+// implement TypeInfo for built-in scalar types
 impl_scalar!(i8, Int8);
 impl_scalar!(i16, Int16);
 impl_scalar!(i32, Int32);
