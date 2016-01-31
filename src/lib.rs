@@ -4,10 +4,12 @@ pub enum Type {
     Int16,
     Int32,
     Int64,
+    ISize,
     UInt8,
     UInt16,
     UInt32,
     UInt64,
+    USize,
     Float32,
     Float64,
     Char,
@@ -53,10 +55,12 @@ impl_atomic!(i8, Int8);
 impl_atomic!(i16, Int16);
 impl_atomic!(i32, Int32);
 impl_atomic!(i64, Int64);
+impl_atomic!(isize, ISize);
 impl_atomic!(u8, UInt8);
 impl_atomic!(u16, UInt16);
 impl_atomic!(u32, UInt32);
 impl_atomic!(u64, UInt64);
+impl_atomic!(usize, USize);
 impl_atomic!(f32, Float32);
 impl_atomic!(f64, Float64);
 impl_atomic!(char, Char);
