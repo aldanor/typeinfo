@@ -181,7 +181,7 @@ macro_rules! def {
             #[allow(dead_code)]
             #[derive(Clone, Copy)]
             $(#[$attr])*
-            pub struct $s { pub $($i: $t),+ }
+            pub struct $s { $(pub $i: $t),+ }
             def!(@impl $s { $($i: $t),+ } );
         )*
     );

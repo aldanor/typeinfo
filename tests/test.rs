@@ -13,6 +13,7 @@ fn test_scalar_types() {
         assert_eq!(ty.size(), mem::size_of::<T>());
         assert!(ty.is_scalar() && !ty.is_array() && !ty.is_compound());
     }
+
     check_scalar_type::<i8>(Int8);
     check_scalar_type::<i16>(Int16);
     check_scalar_type::<i32>(Int32);
@@ -27,7 +28,6 @@ fn test_scalar_types() {
     check_scalar_type::<f64>(Float64);
     check_scalar_type::<bool>(Bool);
     check_scalar_type::<char>(Char);
-
 }
 
 #[test]
@@ -59,4 +59,44 @@ fn test_compound_types() {
         Field::new(&Array(Box::new(X::type_info()), 2), "x", 8),
     ], mem::size_of::<Y>()));
     assert_eq!(ty.size(), mem::size_of::<Y>());
+}
+
+#[test]
+fn test_compound_copy_clone() {
+    def![struct X { a: char }];
+    let x = X { a: '0' };
+    let y = x;
+    assert_eq!(x.a, y.a);
+    assert_eq!(x.clone().a, y.clone().a);
+}
+
+#[test]
+fn test_struct_attributes() {
+    def![struct X { a: i8, b: u64 }];
+    def![#[repr(packed)] struct Y { a: i8, b: u64 }];
+    assert!(X::type_info().size() > Y::type_info().size());
+}
+
+#[cfg(test)]
+mod module {
+    def! {
+        pub struct A {
+            x: i32,
+            y: i32
+        }
+    }
+
+    def! {
+        pub struct B {
+            pub x: i32,
+            pub y: i32
+        }
+    }
+}
+
+#[test]
+#[allow(unused_variables, unused_imports)]
+fn test_pub_structs_fields() {
+    use module::{A, B};
+    let b = B { x: 1, y: 2 };
 }
