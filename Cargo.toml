@@ -13,7 +13,7 @@ description = """Runtime type information for POD types."""
 name = "pod_typeinfo"
 
 [features]
-nightly = ["compiletest_rs", "clippy"]
+unstable = ["compiletest_rs", "clippy"]
 
 [dependencies]
 compiletest_rs = {version = "^0.0.11", optional = true}

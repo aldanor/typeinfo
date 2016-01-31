@@ -1,12 +1,11 @@
-language: rust
 sudo: false
+language: rust
 rust:
-- 1.6.0
+- stable
 - beta
 - nightly
 script:
-- cargo build --verbose && cargo test --verbose
-- cargo doc --no-deps
+- cargo build --verbose && cargo test --verbose && cargo doc --no-deps
 notifications:
   email:
     on_success: never
@@ -16,12 +15,12 @@ os:
 after_success: |
   [ $TRAVIS_BRANCH = "master" ] &&
   [ $TRAVIS_PULL_REQUEST = "false" ] &&
-  [ $TRAVIS_RUST_VERSION = "nightly" ] &&
+  [ $TRAVIS_RUST_VERSION = "stable" ] &&
   [ `uname` = "Linux" ] &&
   echo '<meta http-equiv=refresh content=0;url=pod_typeinfo/index.html>' > target/doc/index.html &&
   pip install ghp-import --user $USER &&
   $HOME/.local/bin/ghp-import -n target/doc &&
-  git push --force https://${TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git gh-pages
+  git push --force https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git gh-pages
 env:
   global:
-    secure: Vk/tN3N2gb2TnFcXEJDuBbJ7ydNNig9p9QSgXc9rCubZ1EzPry1vFshAijwmqSa+Zy9vE6B+00VPIsBgTOofMYK/tQARtdZq76lBy0g1wRKXySMMWsvu/XL+IjmGQuVCOFSDUrH3OgVXn7dw5jrwfVNoz8smwyvvdebCZDbPL+yYzFTv7hBfL9xRkxlpM5BI1F2FGCC2IfyOrMMZbcjJu1duQnP5fs0K0AWQEa0fsO12u/dh/RH3ioWkwUlSMojms90VKjmYNlGjVI5vkMoni8pYrVggEFmQnGxShTPsPTg1vJH6SRnMpTiRMzcyyH5zMiLyWPfLWT2QR29d8ngmm7LWfxGlnDouPLgBzG7Hvys+EnXEHTPiFaVpyNje6C9mLaMxloRN1nU7zsBsd5YOWn9PunVn82wL4IybDmCJg1lfGVDLy+IGm0qO3Q1im/7G6TcHy4DgQ0Zf02PjKcelBjvBIE05IwZwcXO7Da0guBzGiFOzdEn/PWejkDmxDRgeh3CRu9i5XBjGHmYjo1A9z8kusq1IS+vU/thRRDE159hq942HQN6xtpcKi9CzORIw8tErM6HHIhomYiXvgwIrI/FwNH5c2qEakAISw1lfcVnSTsbDah4NghAvCXfd6YN+UE/JKlrsd3fQX8L6ZM3kfTVQBWt1BlhFQ753V/Y0ZI8=
+    secure: A7wRIYzvkG1KIu5nc3SIT2EGszQs/Lu2KZPIMo99FdVbPjVhr6l9Qswbt2S8VAP1mJulD8dGqhuaTWFqoUF6L6uf1leG3FKkD5p3wf8MgfVk0qTQa7XhnB6QJXdghJ0VE0AnEpDk3lJAaun2mQCkmxklOsGHkX9Vg7fORSSEnZbyNERxWegCeLIle9WyJjfMvaJWOI2Yzt3KPSabIFdRMW0rIS3KjEGKSzaqa+1AtrzAR0Y7XJb2sLGnXLQUrt/crO8TG/2i3E0eErAGSS2uYnA7RO7rCUQIxs0nOIHjSXhWTt8kZNrSmbNtjZaoofv2ZDJt3fdqpM7EtpyLQWPJJNRaLjGV7WJmLzqkmW5yvuRBRgCP/b+G2TOtnOL5ECAq5Z3b5bWJRAeo9vC1javQeNwW8JZTSMZimRkeeEFA+g6rg7pvWwt2EgxOHIUKIbBFvh0ci0FCAO1vKhme6NJj7G+Y6E72MfBd6TCE8LEwE+TPjvkaItYLPURzwPHKobO7NAJBxiY2YdwA10TLbtcLxAooY+j9VQ6cuEj2a2HRFI7ExiL49e4kTFU3MQ/L5M3xQs6Kt8ioCnawNxDIHPcDCrF6QRQ99RAFJqzecgEw3urihb15Z5fKgH9w7eodGreH4OQ1iI1SkCTtxtnQLWpxqyfFLDV6A6USt072cIFoftk=

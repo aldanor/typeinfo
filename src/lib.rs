@@ -1,5 +1,5 @@
-#![cfg_attr(feature = "nightly", feature(plugin))]
-#![cfg_attr(feature = "nightly", plugin(clippy))]
+#![cfg_attr(feature = "unstable", feature(plugin))]
+#![cfg_attr(feature = "unstable", plugin(clippy))]
 
 /// POD (*plain old data*) type: scalar, fixed-size array or compound (struct).
 /// May be arbitrarily nested.
