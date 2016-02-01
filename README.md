@@ -8,6 +8,51 @@
 The `pod-typeinfo` crate provides access to type information for POD (*plain old data*)
 types at runtime.
 
+# Examples
+
+Defining reflectable struct types only requires wrapping the struct definition in
+`def!` macro (see documentation for more details):
+
+```rust
+#[use_macro]
+extern crate pod_typeinfo;
+
+def! {
+    #[derive(Debug)]
+    pub struct Color { r: u16, g: u16, b: u16, }
+
+    #[derive(Debug)]
+    #[repr(packed)]
+    pub struct Palette {
+        monochrome: bool,
+        colors: [Color; 16]
+    }
+}
+
+fn main() {
+    println!("{:#?}", Palette::type_info());
+}
+```
+
+Output (whitespace formatted):
+
+```rust
+Compound([
+    Field { ty: Bool, name: "monochrome", offset: 0 },
+    Field {
+        ty: Array(
+            Compound([
+                Field { ty: UInt16, name: "r", offset: 0 },
+                Field { ty: UInt16, name: "g", offset: 2 },
+                Field { ty: UInt16, name: "b", offset: 4 }],
+            6),
+        16),
+        name: "colors",
+        offset: 1
+    }
+], 97)
+```
+
 ## License
 
 `pod-typeinfo` is primarily distributed under the terms of both the MIT license and

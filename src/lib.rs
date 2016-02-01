@@ -1,6 +1,63 @@
 #![cfg_attr(feature = "unstable", feature(plugin))]
 #![cfg_attr(feature = "unstable", plugin(clippy))]
 
+//! The purpose of this crate is to provide an easy way to query the runtime type
+//! information (such as field names, offsets and types) for POD (*plain old data*) types,
+//! and to allow creating such types without the need for much boilerplate. This information
+//! is extremely useful when communicating with foreign low-level libraries, and, more
+//! generally, for any kind of serialization/deserialization work.
+//!
+//! The core functionality is accessible through the
+//! [`type_info`](trait.TypeInfo.html#tymethod.type_info) static
+//! method of the [`TypeInfo`](trait.TypeInfo.html) trait which
+//! comes implemented for all built-in scalar types and fixed-size arrays, and which can
+//! be easily implemented for user types by using the [`def!`](macro.def!.html) macro.
+//!
+//! # Examples
+//!
+//! Defining reflectable struct types only requires wrapping the struct definition in
+//! [`def!`](macro.def!.html):
+//!
+//! ```ignore
+//! #[use_macro]
+//! extern crate pod_typeinfo;
+//!
+//! def! {
+//!     #[derive(Debug)]
+//!     pub struct Color { r: u16, g: u16, b: u16, }
+//!
+//!     #[derive(Debug)]
+//!     #[repr(packed)]
+//!     pub struct Palette {
+//!         monochrome: bool,
+//!         colors: [Color; 16]
+//!     }
+//! }
+//!
+//! fn main() {
+//!     println!("{:#?}", Palette::type_info());
+//! }
+//! ```
+//!
+//! Output (whitespace formatted):
+//!
+//! ```ignore
+//! Compound([
+//!     Field { ty: Bool, name: "monochrome", offset: 0 },
+//!     Field {
+//!         ty: Array(
+//!             Compound([
+//!                 Field { ty: UInt16, name: "r", offset: 0 },
+//!                 Field { ty: UInt16, name: "g", offset: 2 },
+//!                 Field { ty: UInt16, name: "b", offset: 4 }],
+//!             6),
+//!         16),
+//!         name: "colors",
+//!         offset: 1
+//!     }
+//! ], 97)
+//! ```
+
 /// Represents a POD type: scalar, fixed-size array or compound (struct).
 /// May be arbitrarily nested.
 #[derive(Clone, PartialEq, Debug)]
