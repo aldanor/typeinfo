@@ -8,7 +8,7 @@
 The `pod-typeinfo` crate provides access to type information for POD (*plain old data*)
 types at runtime.
 
-# Examples
+## Examples
 
 Defining reflectable struct types only requires wrapping the struct definition in
 `def!` macro (see the docs for more details):
