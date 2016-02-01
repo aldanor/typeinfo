@@ -114,6 +114,6 @@ mod module {
 #[allow(unused_variables, unused_imports)]
 fn test_pub_structs_fields() {
     use module::{A, B};
-    let b = B { x: 1, y: 2 };
     use module::multiple::{E, F, G, H};
+    let b = B { x: 1, y: 2 };
 }
