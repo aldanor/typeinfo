@@ -16,6 +16,7 @@ Defining reflectable struct types only requires wrapping the struct definition i
 ```rust
 #[use_macro]
 extern crate pod_typeinfo;
+use pod_typeinfo::TypeInfo;
 
 def! {
     #[derive(Debug)]
