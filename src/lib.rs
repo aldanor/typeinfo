@@ -1,7 +1,7 @@
 #![cfg_attr(feature = "unstable", feature(plugin))]
 #![cfg_attr(feature = "unstable", plugin(clippy))]
 
-/// POD (*plain old data*) type: scalar, fixed-size array or compound (struct).
+/// Represents a POD type: scalar, fixed-size array or compound (struct).
 /// May be arbitrarily nested.
 #[derive(Clone, PartialEq, Debug)]
 pub enum Type {
@@ -70,7 +70,7 @@ impl Type {
     }
 }
 
-/// Field of a compound type: type, name and offset from the beginning of the struct.
+/// Field of a compound type: contains type, name and offset from the beginning of the struct.
 #[derive(Clone, PartialEq, Debug)]
 pub struct Field {
     /// field value type
@@ -91,6 +91,15 @@ impl Field {
     }
 }
 
+/// Trait implemented by copyable POD data types with fixed size, enables
+/// runtime reflection.
+///
+/// This trait is implemented by default for all built-in scalar types (integer,
+/// floating-point, boolean and character), and there's a generic implementation
+/// for fixed-size arrays.
+///
+/// The easiest way to generate an implementation for a compound type is to use
+/// the provided [`def!`](macro.def!.html) macro.
 pub trait TypeInfo: Copy {
     /// Returns the runtime type information for the implementing type.
     fn type_info() -> Type;
@@ -151,6 +160,35 @@ impl_array!(
     0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f,
 );
 
+/// Compound type constructor that implements [`TypeInfo`](trait.TypeInfo.html)
+/// trait automatically.
+///
+/// This macro can be used anywhere a normal struct definition can be placed, supports
+/// visibility qualifiers, struct attributes, nested datatypes and multiple struct
+/// definitions inside one invocation.
+///
+/// `def!` defines the type as given, derives `Clone` and `Copy`, and implements the
+/// [`TypeInfo`](trait.TypeInfo.html) trait so the type information is readily accessible
+/// at runtime.
+///
+/// *Note:* due to certain limitations of the macro system, a single macro invocation may
+/// only contain definitions where both fields and structs have the same visibility qualifier.
+///
+/// # Examples
+/// ```ignore
+/// def! {
+///     #[derive(Debug)]
+///     pub struct Color {
+///         r: u8,
+///         g: u8,
+///         b: u8,
+///     }
+///
+///     pub struct Palette {
+///         colors: [Color; 16]
+///     }
+/// }
+/// ```
 #[macro_export]
 macro_rules! def {
     // private struct, private fields
