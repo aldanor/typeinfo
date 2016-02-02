@@ -1,11 +1,11 @@
-# pod-typeinfo
+# typeinfo
 
-[![Build Status](https://travis-ci.org/aldanor/pod-typeinfo.svg?branch=master)](https://travis-ci.org/aldanor/pod-typeinfo)
-[![Build Status](https://ci.appveyor.com/api/projects/status/uh34kafh5qs458ue/branch/master?svg=true)](https://ci.appveyor.com/project/aldanor/pod-typeinfo)
+[![Build Status](https://travis-ci.org/aldanor/typeinfo.svg?branch=master)](https://travis-ci.org/aldanor/typeinfo)
+[![Build Status](https://ci.appveyor.com/api/projects/status/uh34kafh5qs458ue/branch/master?svg=true)](https://ci.appveyor.com/project/aldanor/typeinfo)
 
-[Documentation](http://ivansmirnov.io/pod-typeinfo/pod_typeinfo/index.html)
+[Documentation](http://ivansmirnov.io/typeinfo)
 
-The `pod-typeinfo` crate provides access to type information for POD (*plain old data*)
+The `typeinfo` crate provides access to type information for POD (*plain old data*)
 types at runtime.
 
 ## Examples
@@ -15,8 +15,8 @@ Defining reflectable struct types only requires wrapping the struct definition i
 
 ```rust
 #[use_macro]
-extern crate pod_typeinfo;
-use pod_typeinfo::TypeInfo;
+extern crate typeinfo;
+use typeinfo::TypeInfo;
 
 def! {
     #[derive(Debug)]
@@ -56,7 +56,7 @@ Compound([
 
 ## License
 
-`pod-typeinfo` is primarily distributed under the terms of both the MIT license and
+`typeinfo` is primarily distributed under the terms of both the MIT license and
 the Apache License (Version 2.0), with portions covered by various BSD-like
 licenses.
 

@@ -1,5 +1,5 @@
 #[macro_use]
-extern crate pod_typeinfo;
+extern crate typeinfo;
 
 mod m {
     def! {

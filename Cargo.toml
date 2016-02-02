@@ -1,16 +1,17 @@
 [package]
-name = "pod-typeinfo"
-version = "0.1.0"
+name = "typeinfo"
+version = "0.1.1"
 authors = ["Ivan Smirnov <i.s.smirnov@gmail.com>"]
 license = "MIT/Apache-2.0"
 readme = "README.md"
 keywords = ["typeinfo", "pod", "type", "reflection"]
-repository = "https://github.com/aldanor/pod-typeinfo"
-homepage = "https://github.com/aldanor/pod-typeinfo"
+repository = "https://github.com/aldanor/typeinfo"
+homepage = "https://github.com/aldanor/typeinfo"
+documentation = "https://ivansmirnov.io/typeinfo"
 description = """Runtime type information for POD types."""
 
 [lib]
-name = "pod_typeinfo"
+name = "typeinfo"
 
 [features]
 unstable = ["compiletest_rs", "clippy"]

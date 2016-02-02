@@ -1,5 +1,5 @@
 #[macro_use]
-extern crate pod_typeinfo;
+extern crate typeinfo;
 
 def! {
     struct Foo {} //~ ERROR no rules expected the token `}`

@@ -1,10 +1,10 @@
 #[macro_use]
-extern crate pod_typeinfo;
+extern crate typeinfo;
 
 use std::mem;
 
-use pod_typeinfo::Type::*;
-use pod_typeinfo::{Type, TypeInfo, Field};
+use typeinfo::Type::*;
+use typeinfo::{Type, TypeInfo, Field};
 
 #[test]
 fn test_scalar_types() {
