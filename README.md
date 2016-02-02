@@ -11,7 +11,7 @@ types at runtime.
 ## Examples
 
 Defining reflectable struct types only requires wrapping the struct definition in
-`def!` macro (see the docs for more details):
+the [`def!`](http://ivansmirnov.io/typeinfo/typeinfo/macro.def!.html) macro:
 
 ```rust
 #[use_macro]
@@ -60,4 +60,4 @@ Compound([
 the Apache License (Version 2.0), with portions covered by various BSD-like
 licenses.
 
-See LICENSE-APACHE, and LICENSE-MIT for details.
+See [LICENSE-APACHE](LICENSE-APACHE), and [LICENSE-MIT](LICENSE-MIT) for details.

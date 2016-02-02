@@ -23,7 +23,7 @@ after_success: |
   [ $TRAVIS_PULL_REQUEST = "false" ] &&
   [ $TRAVIS_RUST_VERSION = "stable" ] &&
   [ `uname` = "Linux" ] &&
-  echo '<meta http-equiv=refresh content=0;url=pod_typeinfo/index.html>' > target/doc/index.html &&
+  echo '<meta http-equiv=refresh content=0;url=typeinfo/index.html>' > target/doc/index.html &&
   pip install ghp-import --user $USER &&
   $HOME/.local/bin/ghp-import -n target/doc &&
   git push --force https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git gh-pages

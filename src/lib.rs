@@ -20,8 +20,8 @@
 //!
 //! ```ignore
 //! #[use_macro]
-//! extern crate pod_typeinfo;
-//! use pod_typeinfo::TypeInfo;
+//! extern crate typeinfo;
+//! use typeinfo::TypeInfo;
 //!
 //! def! {
 //!     #[derive(Debug)]
