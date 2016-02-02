@@ -71,8 +71,6 @@ pub enum Type {
     Int32,
     /// 8-byte signed integer
     Int64,
-    /// pointer-sized signed integer
-    ISize,
     /// 1-byte unsigned integer
     UInt8,
     /// 2-byte unsigned integer
@@ -81,8 +79,6 @@ pub enum Type {
     UInt32,
     /// 4-byte unsigned integer
     UInt64,
-    /// pointer-sized unsigned integer
-    USize,
     /// 4-byte floating-point number
     Float32,
     /// 8-byte floating-point number
@@ -105,8 +101,6 @@ impl Type {
             Type::Int16 | Type::UInt16 => 2,
             Type::Int32 | Type::UInt32 | Type::Float32 | Type::Char => 4,
             Type::Int64 | Type::UInt64 | Type::Float64 => 8,
-            Type::USize => ::std::mem::size_of::<usize>(),
-            Type::ISize => ::std::mem::size_of::<isize>(),
             Type::Array(ref ty, num) => ty.size() * num,
             Type::Compound(_, size) => size,
         }
@@ -154,7 +148,9 @@ impl Field {
 ///
 /// This trait is implemented by default for all built-in scalar types (integer,
 /// floating-point, boolean and character), and there's a generic implementation
-/// for fixed-size arrays.
+/// for fixed-size arrays. Note that pointer-sized integer types `isize` /
+/// `usize` map to either `Int32` / `UInt32` or `Int64` / `UInt64` respectively,
+/// depending on the host platform.
 ///
 /// The easiest way to generate an implementation for a compound type is to use
 /// the provided [`def!`](macro.def!.html) macro.
@@ -179,16 +175,20 @@ impl_scalar!(i8, Int8);
 impl_scalar!(i16, Int16);
 impl_scalar!(i32, Int32);
 impl_scalar!(i64, Int64);
-impl_scalar!(isize, ISize);
 impl_scalar!(u8, UInt8);
 impl_scalar!(u16, UInt16);
 impl_scalar!(u32, UInt32);
 impl_scalar!(u64, UInt64);
-impl_scalar!(usize, USize);
 impl_scalar!(f32, Float32);
 impl_scalar!(f64, Float64);
 impl_scalar!(char, Char);
 impl_scalar!(bool, Bool);
+
+#[cfg(target_pointer_width = "32")] impl_scalar!(isize, Int32);
+#[cfg(target_pointer_width = "64")] impl_scalar!(isize, Int64);
+
+#[cfg(target_pointer_width = "32")] impl_scalar!(usize, UInt32);
+#[cfg(target_pointer_width = "64")] impl_scalar!(usize, UInt64);
 
 macro_rules! impl_array {
     ($($n:expr),*$(,)*) => {

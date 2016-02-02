@@ -22,12 +22,18 @@ fn test_scalar_types() {
     check_scalar_type::<u16>(UInt16);
     check_scalar_type::<u32>(UInt32);
     check_scalar_type::<u64>(UInt64);
-    check_scalar_type::<isize>(ISize);
-    check_scalar_type::<usize>(USize);
     check_scalar_type::<f32>(Float32);
     check_scalar_type::<f64>(Float64);
     check_scalar_type::<bool>(Bool);
     check_scalar_type::<char>(Char);
+
+    if mem::size_of::<usize>() == 4 {
+        check_scalar_type::<isize>(Int32);
+        check_scalar_type::<usize>(UInt32);
+    } else {
+        check_scalar_type::<isize>(Int64);
+        check_scalar_type::<usize>(UInt64);
+    }
 }
 
 #[test]
