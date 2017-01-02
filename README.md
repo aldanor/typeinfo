@@ -14,7 +14,7 @@ Defining reflectable struct types only requires wrapping the struct definition i
 the [`def!`](http://ivansmirnov.io/typeinfo/typeinfo/macro.def!.html) macro:
 
 ```rust
-#[use_macro]
+#[macro_use]
 extern crate typeinfo;
 use typeinfo::TypeInfo;
 

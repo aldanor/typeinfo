@@ -19,7 +19,7 @@
 //! [`def!`](macro.def!.html):
 //!
 //! ```ignore
-//! #[use_macro]
+//! #[macro_use]
 //! extern crate typeinfo;
 //! use typeinfo::TypeInfo;
 //!
