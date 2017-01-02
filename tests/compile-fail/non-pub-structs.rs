@@ -3,12 +3,12 @@ extern crate typeinfo;
 
 mod m {
     def! {
-        pub struct Bar {
+        struct Foo {
             a: i32,
         }
     }
 }
 
 fn main() {
-    let _ = m::Bar { a: 1 }; //~ ERROR field `a` of struct `m::Bar` is private
+    use m::Foo; //~ ERROR struct `Foo` is private
 }
