@@ -1,0 +1,24 @@
+[package]
+name = "typeinfo_derive"
+version = "0.1.1"
+authors = ["Ivan Smirnov <i.s.smirnov@gmail.com>"]
+license = "MIT/Apache-2.0"
+readme = "README.md"
+keywords = ["typeinfo", "pod", "type", "reflection"]
+repository = "https://github.com/aldanor/typeinfo"
+homepage = "https://github.com/aldanor/typeinfo"
+documentation = "https://docs.rs/typeinfo"
+description = """Custom derive for typeinfo::TypeInfo trait."""
+
+[lib]
+proc-macro = true
+name = "typeinfo_derive"
+
+[features]
+unstable = ["compiletest_rs"]
+
+[dependencies]
+syn = "0.10"
+quote = "0.3"
+typeinfo = { version = "0.1.1", path = ".." }
+compiletest_rs = {version = "*", optional = true}
