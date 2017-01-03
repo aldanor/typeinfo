@@ -249,13 +249,29 @@ impl_array!(
 /// ```
 #[macro_export]
 macro_rules! def {
+    // private unit struct
+    ($($(#[$attr:meta])* struct $s:ident);+$(;)*) => (
+        $(
+            #[derive(Clone, Copy)]
+            $(#[$attr])* struct $s;
+            def!(@impl $s { });
+        )*
+    );
+
+    // public unit struct
+    ($($(#[$attr:meta])* pub struct $s:ident);+$(;)*) => (
+        $(
+            #[derive(Clone, Copy)]
+            $(#[$attr])* pub struct $s;
+            def!(@impl $s { });
+        )*
+    );
+
     // private struct, private fields
     ($($(#[$attr:meta])* struct $s:ident { $($i:ident: $t:ty),+$(,)* })*) => (
         $(
-            #[allow(dead_code)]
             #[derive(Clone, Copy)]
-            $(#[$attr])*
-            struct $s { $($i: $t),+ }
+            $(#[$attr])* struct $s { $($i: $t),+ }
             def!(@impl $s { $($i: $t),+ } );
         )*
     );
@@ -263,10 +279,8 @@ macro_rules! def {
     // public struct, private fields
     ($($(#[$attr:meta])* pub struct $s:ident { $($i:ident: $t:ty),+$(,)* })*) => (
         $(
-            #[allow(dead_code)]
             #[derive(Clone, Copy)]
-            $(#[$attr])*
-            pub struct $s { $($i: $t),+ }
+            $(#[$attr])* pub struct $s { $($i: $t),+ }
             def!(@impl $s { $($i: $t),+ } );
         )*
     );
@@ -274,17 +288,16 @@ macro_rules! def {
     // public struct, public fields
     ($($(#[$attr:meta])* pub struct $s:ident { $(pub $i:ident: $t:ty),+$(,)* })*) => (
         $(
-            #[allow(dead_code)]
             #[derive(Clone, Copy)]
-            $(#[$attr])*
-            pub struct $s { $(pub $i: $t),+ }
+            $(#[$attr])* pub struct $s { $(pub $i: $t),+ }
             def!(@impl $s { $($i: $t),+ } );
         )*
     );
 
     // implement TypeInfo trait
-    (@impl $s:ident { $($i:ident: $t:ty),+ }) => (
+    (@impl $s:ident { $($i:ident: $t:ty),* }) => (
         impl $crate::TypeInfo for $s {
+            #[allow(dead_code, unused_variables)]
             fn type_info() -> $crate::Type {
                 let base = 0usize as *const $s;
                 $crate::Type::Compound(vec![$(
@@ -293,7 +306,7 @@ macro_rules! def {
                         stringify!($i),
                         unsafe { &((*base).$i) as *const $t as usize}
                     )
-                ),+], ::std::mem::size_of::<$s>())
+                ),*], ::std::mem::size_of::<$s>())
             }
         }
     );

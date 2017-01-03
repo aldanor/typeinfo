@@ -67,6 +67,12 @@ fn test_compound_types() {
     ], mem::size_of::<Y>()));
     assert_eq!(ty.size(), mem::size_of::<Y>());
     assert!(ty.is_compound() && !ty.is_scalar() && !ty.is_array());
+
+    def![struct Z];
+    let ty = Z::type_info();
+    assert_eq!(ty, Compound(vec![], mem::size_of::<Z>()));
+    assert_eq!(ty.size(), mem::size_of::<Z>());
+    assert!(ty.is_compound() && !ty.is_scalar() && !ty.is_array());
 }
 
 #[test]
@@ -100,6 +106,10 @@ mod module {
         }
     }
 
+    def! {
+        pub struct U;
+    }
+
     pub mod multiple {
         def! {
             struct C { x: i32 }
@@ -113,13 +123,21 @@ mod module {
             pub struct G { pub x: i32 }
             pub struct H { pub x: i32 }
         }
+        def! {
+            struct U1;
+            struct U2
+        }
+        def! {
+            pub struct W1;
+            pub struct W2;
+        }
     }
 }
 
 #[test]
 #[allow(unused_variables, unused_imports)]
 fn test_pub_structs_fields() {
-    use module::{A, B};
-    use module::multiple::{E, F, G, H};
+    use module::{A, B, U};
+    use module::multiple::{E, F, G, H, W1, W2};
     let b = B { x: 1, y: 2 };
 }

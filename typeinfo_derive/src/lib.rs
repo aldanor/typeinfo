@@ -19,7 +19,7 @@ pub fn type_info(input: TokenStream) -> TokenStream {
     let (impl_gen, ty_gen, where_clause) = ast.generics.split_for_impl();
     let body = type_info_impl(&ast.body);
     let gen = quote! {
-        #[allow(dead_code)]
+        #[allow(dead_code, unused_variables)]
         impl #impl_gen ::typeinfo::TypeInfo for #name #ty_gen #where_clause {
             fn type_info() -> ::typeinfo::Type {
                 let size = ::std::mem::size_of::<#name>();
