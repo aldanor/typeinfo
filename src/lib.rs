@@ -298,4 +298,3 @@ macro_rules! def {
         }
     );
 }
-
