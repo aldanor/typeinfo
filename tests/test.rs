@@ -50,6 +50,15 @@ fn test_array_types() {
 }
 
 #[test]
+fn test_tuple_types() {
+    let ty = <(i8, u16) as TypeInfo>::type_info();
+    let size = mem::size_of::<(i8, u16)>();
+    assert_eq!(ty, Tuple(vec![Int8, UInt16], size));
+    assert_eq!(ty.size(), size);
+    assert!(ty.is_tuple());
+}
+
+#[test]
 fn test_compound_types() {
     def![struct X { a: i32, }];
     let ty = X::type_info();

@@ -225,6 +225,42 @@ impl_array!(
     0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f,
 );
 
+macro_rules! impl_tuple {
+    ($t:ident) => {
+        impl<$t> $crate::TypeInfo for ($t,) where $t: $crate::TypeInfo {
+            #[inline(always)]
+            fn type_info() -> $crate::Type {
+                $crate::Type::Tuple(
+                    vec![<$t as $crate::TypeInfo>::type_info()],
+                    ::std::mem::size_of::<($t,)>()
+                )
+            }
+        }
+    };
+
+    ($t:ident, $($tt:ident),*) => {
+        impl<$t, $($tt),*> $crate::TypeInfo for ($t, $($tt),*)
+        where $t: $crate::TypeInfo, $($tt: $crate::TypeInfo),* {
+            #[inline(always)]
+            fn type_info() -> $crate::Type {
+                $crate::Type::Tuple(
+                    vec![
+                        <$t as $crate::TypeInfo>::type_info(),
+                        $(<$tt as $crate::TypeInfo>::type_info()),*
+                    ], ::std::mem::size_of::<($t, $($tt),*)>()
+                )
+            }
+        }
+
+        impl_tuple!($($tt),*);
+    };
+}
+
+// implement TypeInfo for tuples of sizes 0..15
+impl_tuple!(
+    T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15
+);
+
 /// Compound type constructor that implements [`TypeInfo`](trait.TypeInfo.html)
 /// trait automatically.
 ///
