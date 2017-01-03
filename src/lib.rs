@@ -91,6 +91,8 @@ pub enum Type {
     Array(Box<Type>, usize),
     /// compound type whose fields are POD
     Compound(Vec<Field>, usize),
+    /// tuple or a tuple struct with POD elements
+    Tuple(Vec<Type>, usize),
 }
 
 impl Type {
@@ -102,7 +104,7 @@ impl Type {
             Type::Int32 | Type::UInt32 | Type::Float32 | Type::Char => 4,
             Type::Int64 | Type::UInt64 | Type::Float64 => 8,
             Type::Array(ref ty, num) => ty.size() * num,
-            Type::Compound(_, size) => size,
+            Type::Compound(_, size) | Type::Tuple(_, size) => size,
         }
     }
 
@@ -119,6 +121,11 @@ impl Type {
     /// Returns true if the underlying type is compound.
     pub fn is_compound(&self) -> bool {
         if let Type::Compound(_, _) = *self { true } else { false }
+    }
+
+    /// Returns true if the underlying type is a tuple or a tuple struct.
+    pub fn is_tuple(&self) -> bool {
+        if let Type::Tuple(_, _) = *self { true } else { false }
     }
 }
 
