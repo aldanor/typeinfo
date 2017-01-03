@@ -7,7 +7,7 @@ readme = "README.md"
 keywords = ["typeinfo", "pod", "type", "reflection"]
 repository = "https://github.com/aldanor/typeinfo"
 homepage = "https://github.com/aldanor/typeinfo"
-documentation = "https://ivansmirnov.io/typeinfo"
+documentation = "https://docs.rs/typeinfo"
 description = """Runtime type information for POD types."""
 
 [lib]
