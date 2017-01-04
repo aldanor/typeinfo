@@ -19,10 +19,10 @@ extern crate typeinfo;
 use typeinfo::TypeInfo;
 
 def! {
-    #[derive(Debug)]
+    #[derive(Clone, Copy, Debug)]
     pub struct Color { r: u16, g: u16, b: u16, }
 
-    #[derive(Debug)]
+    #[derive(Clone, Copy, Debug)]
     #[repr(packed)]
     pub struct Palette {
         monochrome: bool,

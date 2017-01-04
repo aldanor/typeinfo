@@ -24,10 +24,10 @@
 //! use typeinfo::TypeInfo;
 //!
 //! def! {
-//!     #[derive(Debug)]
+//!     #[derive(Clone, Copy, Debug)]
 //!     pub struct Color { r: u16, g: u16, b: u16, }
 //!
-//!     #[derive(Debug)]
+//!     #[derive(Clone, Copy, Debug)]
 //!     #[repr(packed)]
 //!     pub struct Palette {
 //!         monochrome: bool,
@@ -290,47 +290,27 @@ impl_tuple!(
 macro_rules! def {
     // private unit struct
     ($($(#[$attr:meta])* struct $s:ident);+$(;)*) => (
-        $(
-            #[derive(Clone, Copy)]
-            $(#[$attr])* struct $s;
-            def!(@impl $s { });
-        )*
+        $($(#[$attr])* struct $s; def!(@impl $s { });)*
     );
 
     // public unit struct
     ($($(#[$attr:meta])* pub struct $s:ident);+$(;)*) => (
-        $(
-            #[derive(Clone, Copy)]
-            $(#[$attr])* pub struct $s;
-            def!(@impl $s { });
-        )*
+        $($(#[$attr])* pub struct $s; def!(@impl $s { });)*
     );
 
     // private struct, private fields
     ($($(#[$attr:meta])* struct $s:ident { $($i:ident: $t:ty),+$(,)* })*) => (
-        $(
-            #[derive(Clone, Copy)]
-            $(#[$attr])* struct $s { $($i: $t),+ }
-            def!(@impl $s { $($i: $t),+ } );
-        )*
+        $($(#[$attr])* struct $s { $($i: $t),+ } def!(@impl $s { $($i: $t),+ } );)*
     );
 
     // public struct, private fields
     ($($(#[$attr:meta])* pub struct $s:ident { $($i:ident: $t:ty),+$(,)* })*) => (
-        $(
-            #[derive(Clone, Copy)]
-            $(#[$attr])* pub struct $s { $($i: $t),+ }
-            def!(@impl $s { $($i: $t),+ } );
-        )*
+        $($(#[$attr])* pub struct $s { $($i: $t),+ } def!(@impl $s { $($i: $t),+ } );)*
     );
 
     // public struct, public fields
     ($($(#[$attr:meta])* pub struct $s:ident { $(pub $i:ident: $t:ty),+$(,)* })*) => (
-        $(
-            #[derive(Clone, Copy)]
-            $(#[$attr])* pub struct $s { $(pub $i: $t),+ }
-            def!(@impl $s { $($i: $t),+ } );
-        )*
+        $($(#[$attr])* pub struct $s { $(pub $i: $t),+ } def!(@impl $s { $($i: $t),+ } );)*
     );
 
     // implement TypeInfo trait

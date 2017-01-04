@@ -3,7 +3,7 @@ extern crate typeinfo;
 
 mod m {
     def! {
-        struct Foo {
+        #[derive(Clone, Copy)] struct Foo {
             a: i32,
         }
     }

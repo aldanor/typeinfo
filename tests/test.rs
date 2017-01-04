@@ -60,7 +60,7 @@ fn test_tuple_types() {
 
 #[test]
 fn test_compound_types() {
-    def![struct X { a: i32, }];
+    def![#[derive(Clone, Copy)] struct X { a: i32, }];
     let ty = X::type_info();
     assert_eq!(ty, Compound(vec![
         NamedField::new(&Int32, "a", 0)
@@ -68,7 +68,7 @@ fn test_compound_types() {
     assert_eq!(ty.size(), mem::size_of::<X>());
     assert!(ty.is_compound() && !ty.is_scalar() && !ty.is_array());
 
-    def![struct Y { a: u64, x: [X; 2] }];
+    def![#[derive(Clone, Copy)] struct Y { a: u64, x: [X; 2] }];
     let ty = Y::type_info();
     assert_eq!(ty, Compound(vec![
         NamedField::new(&UInt64, "a", 0),
@@ -77,7 +77,7 @@ fn test_compound_types() {
     assert_eq!(ty.size(), mem::size_of::<Y>());
     assert!(ty.is_compound() && !ty.is_scalar() && !ty.is_array());
 
-    def![struct Z];
+    def![#[derive(Clone, Copy)] struct Z];
     let ty = Z::type_info();
     assert_eq!(ty, Compound(vec![], mem::size_of::<Z>()));
     assert_eq!(ty.size(), mem::size_of::<Z>());
@@ -86,7 +86,7 @@ fn test_compound_types() {
 
 #[test]
 fn test_compound_copy_clone() {
-    def![struct X { a: char }];
+    def![#[derive(Clone, Copy)] struct X { a: char }];
     let x = X { a: '0' };
     let y = x;
     assert_eq!(x.a, y.a);
@@ -95,50 +95,50 @@ fn test_compound_copy_clone() {
 
 #[test]
 fn test_struct_attributes() {
-    def![struct X { a: i8, b: u64 }];
-    def![#[repr(packed)] struct Y { a: i8, b: u64 }];
+    def![#[derive(Clone, Copy)] struct X { a: i8, b: u64 }];
+    def![#[repr(packed)] #[derive(Clone, Copy)] struct Y { a: i8, b: u64 }];
     assert!(X::type_info().size() > Y::type_info().size());
 }
 
 #[cfg(test)]
 mod module {
     def! {
-        pub struct A {
+        #[derive(Clone, Copy)] pub struct A {
             x: i32,
             y: i32
         }
     }
     def! {
-        pub struct B {
+        #[derive(Clone, Copy)] pub struct B {
             pub x: i32,
             pub y: i32
         }
     }
 
     def! {
-        pub struct U;
+        #[derive(Clone, Copy)] pub struct U;
     }
 
     pub mod multiple {
         def! {
-            struct C { x: i32 }
-            struct D { x: i32 }
+            #[derive(Clone, Copy)] struct C { x: i32 }
+            #[derive(Clone, Copy)] struct D { x: i32 }
         }
         def! {
-            pub struct E { x: i32 }
-            pub struct F { x: i32 }
+            #[derive(Clone, Copy)] pub struct E { x: i32 }
+            #[derive(Clone, Copy)] pub struct F { x: i32 }
         }
         def! {
-            pub struct G { pub x: i32 }
-            pub struct H { pub x: i32 }
+            #[derive(Clone, Copy)] pub struct G { pub x: i32 }
+            #[derive(Clone, Copy)] pub struct H { pub x: i32 }
         }
         def! {
-            struct U1;
-            struct U2
+            #[derive(Clone, Copy)] struct U1;
+            #[derive(Clone, Copy)] struct U2
         }
         def! {
-            pub struct W1;
-            pub struct W2;
+            #[derive(Clone, Copy)] pub struct W1;
+            #[derive(Clone, Copy)] pub struct W2;
         }
     }
 }
