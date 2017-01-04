@@ -318,12 +318,11 @@ macro_rules! def {
         impl $crate::TypeInfo for $s {
             #[allow(dead_code, unused_variables)]
             fn type_info() -> $crate::Type {
-                let base = 0usize as *const $s;
                 $crate::Type::Compound(vec![$(
                     $crate::NamedField::new(
                         &<$t as $crate::TypeInfo>::type_info(),
                         stringify!($i),
-                        unsafe { &((*base).$i) as *const $t as usize}
+                        unsafe { &((*(0usize as *const $s)).$i) as *const _ as usize }
                     )
                 ),*], ::std::mem::size_of::<$s>())
             }

@@ -22,8 +22,8 @@ pub fn type_info(input: TokenStream) -> TokenStream {
         #[allow(dead_code, unused_variables)]
         impl #impl_gen ::typeinfo::TypeInfo for #name #ty_gen #where_clause {
             fn type_info() -> ::typeinfo::Type {
-                let size = ::std::mem::size_of::<#name>();
-                let base = 0usize as *const #name;
+                let ty_size = ::std::mem::size_of::<#name>();
+                let origin = 0usize as *const #name;
                 #body
             }
         }
@@ -34,20 +34,20 @@ pub fn type_info(input: TokenStream) -> TokenStream {
 fn type_info_impl(body: &Body) -> quote::Tokens {
     match *body {
         Body::Struct(VariantData::Unit) => {
-            quote! { ::typeinfo::Type::Compound(vec![], size) }
+            quote! { ::typeinfo::Type::Compound(vec![], ty_size) }
         },
         Body::Struct(VariantData::Struct(ref fs)) => {
-            let name1 = fs.iter().map(|f| &f.ident);
-            let name2 = fs.iter().map(|f| &f.ident);
-            let ty1 = fs.iter().map(|f| &f.ty);
-            let ty2 = fs.iter().map(|f| &f.ty);
+            // duplicate iterators because of `quote!` limitations
+            let field_name_1 = fs.iter().map(|f| &f.ident);
+            let field_name_2 = fs.iter().map(|f| &f.ident);
+            let field_ty = fs.iter().map(|f| &f.ty);
             quote! {
                 ::typeinfo::Type::Compound(vec![
                     #(::typeinfo::NamedField::new(
-                        &<#ty1 as ::typeinfo::TypeInfo>::type_info(),
-                        stringify!(#name1),
-                        unsafe { &((*base).#name2) as *const #ty2 as usize }
-                    )),*], size)
+                        &<#field_ty as ::typeinfo::TypeInfo>::type_info(),
+                        stringify!(#field_name_1),
+                        unsafe { &((*origin).#field_name_2) as *const _ as usize }
+                    )),*], ty_size)
             }
         },
         Body::Struct(VariantData::Tuple(_)) => {
