@@ -56,6 +56,11 @@ fn test_tuple_types() {
     assert_eq!(ty, Tuple(vec![Int8, UInt16], size));
     assert_eq!(ty.size(), size);
     assert!(ty.is_tuple());
+
+    let ty = <() as TypeInfo>::type_info();
+    assert_eq!(ty, Tuple(vec![], 0));
+    assert_eq!(ty.size(), 0);
+    assert!(ty.is_tuple());
 }
 
 #[test]

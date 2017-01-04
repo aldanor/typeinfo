@@ -232,6 +232,13 @@ macro_rules! impl_tuple {
                 )
             }
         }
+
+        impl $crate::TypeInfo for () {
+            #[inline(always)]
+            fn type_info() -> $crate::Type {
+                $crate::Type::Tuple(vec![], ::std::mem::size_of::<()>())
+            }
+        }
     };
 
     ($t:ident, $($tt:ident),*) => {
