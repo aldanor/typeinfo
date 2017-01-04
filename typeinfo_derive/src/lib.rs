@@ -43,7 +43,7 @@ fn type_info_impl(body: &Body) -> quote::Tokens {
             let ty2 = fs.iter().map(|f| &f.ty);
             quote! {
                 ::typeinfo::Type::Compound(vec![
-                    #(::typeinfo::Field::new(
+                    #(::typeinfo::NamedField::new(
                         &<#ty1 as ::typeinfo::TypeInfo>::type_info(),
                         stringify!(#name1),
                         unsafe { &((*base).#name2) as *const #ty2 as usize }

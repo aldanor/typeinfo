@@ -44,13 +44,13 @@
 //!
 //! ```ignore
 //! Compound([
-//!     Field { ty: Bool, name: "monochrome", offset: 0 },
-//!     Field {
+//!     NamedField { ty: Bool, name: "monochrome", offset: 0 },
+//!     NamedField {
 //!         ty: Array(
 //!                 Compound([
-//!                     Field { ty: UInt16, name: "r", offset: 0 },
-//!                     Field { ty: UInt16, name: "g", offset: 2 },
-//!                     Field { ty: UInt16, name: "b", offset: 4 }
+//!                     NamedField { ty: UInt16, name: "r", offset: 0 },
+//!                     NamedField { ty: UInt16, name: "g", offset: 2 },
+//!                     NamedField { ty: UInt16, name: "b", offset: 4 }
 //!                 ], 6),
 //!             16),
 //!         name: "colors",
@@ -90,7 +90,7 @@ pub enum Type {
     /// fixed-size array with POD elements
     Array(Box<Type>, usize),
     /// compound type whose fields are POD
-    Compound(Vec<Field>, usize),
+    Compound(Vec<NamedField>, usize),
     /// tuple or a tuple struct with POD elements
     Tuple(Vec<Type>, usize),
 }
@@ -129,9 +129,9 @@ impl Type {
     }
 }
 
-/// Field of a compound type: contains type, name and offset from the beginning of the struct.
+/// Named field of a compound type: contains type, name and offset from the origin.
 #[derive(Clone, PartialEq, Debug)]
-pub struct Field {
+pub struct NamedField {
     /// field value type
     pub ty: Type,
     /// field name
@@ -140,13 +140,9 @@ pub struct Field {
     pub offset: usize,
 }
 
-impl Field {
-    pub fn new<S: Into<String>>(ty: &Type, name: S, offset: usize) -> Field {
-        Field {
-            ty: ty.clone(),
-            name: name.into(),
-            offset: offset
-        }
+impl NamedField {
+    pub fn new<S: Into<String>>(ty: &Type, name: S, offset: usize) -> NamedField {
+        NamedField { ty: ty.clone(), name: name.into(), offset: offset }
     }
 }
 
@@ -344,7 +340,7 @@ macro_rules! def {
             fn type_info() -> $crate::Type {
                 let base = 0usize as *const $s;
                 $crate::Type::Compound(vec![$(
-                    $crate::Field::new(
+                    $crate::NamedField::new(
                         &<$t as $crate::TypeInfo>::type_info(),
                         stringify!($i),
                         unsafe { &((*base).$i) as *const $t as usize}

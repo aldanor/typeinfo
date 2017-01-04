@@ -39,13 +39,13 @@ Output (whitespace formatted):
 
 ```rust
 Compound([
-    Field { ty: Bool, name: "monochrome", offset: 0 },
-    Field {
+    NamedField { ty: Bool, name: "monochrome", offset: 0 },
+    NamedField {
         ty: Array(
                 Compound([
-                    Field { ty: UInt16, name: "r", offset: 0 },
-                    Field { ty: UInt16, name: "g", offset: 2 },
-                    Field { ty: UInt16, name: "b", offset: 4 }
+                    NamedField { ty: UInt16, name: "r", offset: 0 },
+                    NamedField { ty: UInt16, name: "g", offset: 2 },
+                    NamedField { ty: UInt16, name: "b", offset: 4 }
                 ], 6),
             16),
         name: "colors",
