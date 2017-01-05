@@ -15,10 +15,12 @@ proc-macro = true
 name = "typeinfo_derive"
 
 [features]
-unstable = ["compiletest_rs"]
+default = []
+unstable = ["compiletest_rs", "clippy"]
 
 [dependencies]
 syn = "0.10"
 quote = "0.3"
 typeinfo = { version = "0.1.1", path = ".." }
 compiletest_rs = {version = "*", optional = true}
+clippy = {version = "*", optional = true}

@@ -14,8 +14,9 @@ description = """Runtime type information for POD types."""
 name = "typeinfo"
 
 [features]
+default = []
 unstable = ["compiletest_rs", "clippy"]
 
 [dependencies]
-clippy = {version = "^0.0.37", optional = true}
-compiletest_rs = {version = "^0.2.5", optional = true}
+compiletest_rs = {version = "*", optional = true}
+clippy = {version = "*", optional = true}
