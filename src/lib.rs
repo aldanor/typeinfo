@@ -111,7 +111,7 @@ impl Type {
 
     /// Returns true if the underlying type is a scalar.
     pub fn is_scalar(&self) -> bool {
-        !self.is_array() && !self.is_compound()
+        !self.is_array() && !self.is_compound() && !self.is_tuple()
     }
 
     /// Returns true if the underlying type is a fixed-size array.
