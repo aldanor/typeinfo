@@ -317,13 +317,14 @@ impl_tuple! { T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T
 /// # Examples
 /// ```ignore
 /// def! {
-///     #[derive(Debug)]
+///     #[derive(Clone, Copy)]
 ///     pub struct Color {
 ///         r: u8,
 ///         g: u8,
 ///         b: u8,
 ///     }
 ///
+///     #[derive(Clone, Copy)]
 ///     pub struct Palette {
 ///         colors: [Color; 16]
 ///     }
