@@ -19,7 +19,7 @@ fn test_compound_types() {
     assert_eq!(ty,
                Compound(vec![NamedField::new(&Int32, "a", 0)], mem::size_of::<X>()));
     assert_eq!(ty.size(), mem::size_of::<X>());
-    assert!(ty.is_compound() && !ty.is_scalar() && !ty.is_array());
+    assert!(ty.is_compound());
 
     #[derive(Copy, Clone, TypeInfo)]
     struct Y {
@@ -32,12 +32,12 @@ fn test_compound_types() {
                              NamedField::new(&Array(Box::new(X::type_info()), 2), "x", 8)],
                         mem::size_of::<Y>()));
     assert_eq!(ty.size(), mem::size_of::<Y>());
-    assert!(ty.is_compound() && !ty.is_scalar() && !ty.is_array());
+    assert!(ty.is_compound());
 
     #[derive(Copy, Clone, TypeInfo)]
     struct Z;
     let ty = Z::type_info();
     assert_eq!(ty, Compound(vec![], mem::size_of::<Z>()));
     assert_eq!(ty.size(), mem::size_of::<Z>());
-    assert!(ty.is_compound() && !ty.is_scalar() && !ty.is_array());
+    assert!(ty.is_compound());
 }

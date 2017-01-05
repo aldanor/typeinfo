@@ -11,7 +11,7 @@ fn test_scalar_types() {
     fn check_scalar_type<T: TypeInfo>(ty: Type) {
         assert_eq!(<T as TypeInfo>::type_info(), ty);
         assert_eq!(ty.size(), mem::size_of::<T>());
-        assert!(ty.is_scalar() && !ty.is_array() && !ty.is_compound());
+        assert!(ty.is_scalar());
     }
 
     check_scalar_type::<i8>(Int8);
@@ -41,12 +41,12 @@ fn test_array_types() {
     let ty = <[u16; 42] as TypeInfo>::type_info();
     assert_eq!(ty, Array(Box::new(UInt16), 42));
     assert_eq!(ty.size(), 2 * 42);
-    assert!(ty.is_array() && !ty.is_scalar() && !ty.is_compound());
+    assert!(ty.is_array());
 
     let ty = <[[i8; 2]; 3] as TypeInfo>::type_info();
     assert_eq!(ty, Array(Box::new(Array(Box::new(Int8), 2)), 3));
     assert_eq!(ty.size(), 1 * 2 * 3);
-    assert!(ty.is_array() && !ty.is_scalar() && !ty.is_compound());
+    assert!(ty.is_array());
 }
 
 #[test]
@@ -71,7 +71,7 @@ fn test_compound_types() {
         NamedField::new(&Int32, "a", 0)
     ], mem::size_of::<X>()));
     assert_eq!(ty.size(), mem::size_of::<X>());
-    assert!(ty.is_compound() && !ty.is_scalar() && !ty.is_array());
+    assert!(ty.is_compound());
 
     def![#[derive(Clone, Copy)] struct Y { a: u64, x: [X; 2] }];
     let ty = Y::type_info();
@@ -80,13 +80,13 @@ fn test_compound_types() {
         NamedField::new(&Array(Box::new(X::type_info()), 2), "x", 8),
     ], mem::size_of::<Y>()));
     assert_eq!(ty.size(), mem::size_of::<Y>());
-    assert!(ty.is_compound() && !ty.is_scalar() && !ty.is_array());
+    assert!(ty.is_compound());
 
     def![#[derive(Clone, Copy)] struct Z];
     let ty = Z::type_info();
     assert_eq!(ty, Compound(vec![], mem::size_of::<Z>()));
     assert_eq!(ty.size(), mem::size_of::<Z>());
-    assert!(ty.is_compound() && !ty.is_scalar() && !ty.is_array());
+    assert!(ty.is_compound());
 }
 
 #[test]
