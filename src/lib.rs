@@ -104,7 +104,8 @@ impl Type {
             Type::Int32 | Type::UInt32 | Type::Float32 | Type::Char => 4,
             Type::Int64 | Type::UInt64 | Type::Float64 => 8,
             Type::Array(ref ty, num) => ty.size() * num,
-            Type::Compound(_, size) | Type::Tuple(_, size) => size,
+            Type::Compound(_, size) |
+            Type::Tuple(_, size) => size,
         }
     }
 
@@ -115,17 +116,29 @@ impl Type {
 
     /// Returns true if the underlying type is a fixed-size array.
     pub fn is_array(&self) -> bool {
-        if let Type::Array(_, _) = *self { true } else { false }
+        if let Type::Array(_, _) = *self {
+            true
+        } else {
+            false
+        }
     }
 
     /// Returns true if the underlying type is compound.
     pub fn is_compound(&self) -> bool {
-        if let Type::Compound(_, _) = *self { true } else { false }
+        if let Type::Compound(_, _) = *self {
+            true
+        } else {
+            false
+        }
     }
 
     /// Returns true if the underlying type is a tuple or a tuple struct.
     pub fn is_tuple(&self) -> bool {
-        if let Type::Tuple(_, _) = *self { true } else { false }
+        if let Type::Tuple(_, _) = *self {
+            true
+        } else {
+            false
+        }
     }
 }
 
@@ -142,10 +155,31 @@ pub struct NamedField {
 
 impl NamedField {
     pub fn new<S: Into<String>>(ty: &Type, name: S, offset: usize) -> NamedField {
-        NamedField { ty: ty.clone(), name: name.into(), offset: offset }
+        NamedField {
+            ty: ty.clone(),
+            name: name.into(),
+            offset: offset,
+        }
     }
 }
 
+/// Anonymous field of a tuple or a tuple struct: contains type and offset from the origin.
+#[derive(Clone, PartialEq, Debug)]
+pub struct Field {
+    /// field value type
+    pub ty: Type,
+    /// offset to the beginning of the struct
+    pub offset: usize,
+}
+
+impl Field {
+    pub fn new<S: Into<String>>(ty: &Type, offset: usize) -> Field {
+        Field {
+            ty: ty.clone(),
+            offset: offset,
+        }
+    }
+}
 /// Trait implemented by copyable POD data types with fixed size, enables
 /// runtime reflection.
 ///
@@ -187,11 +221,15 @@ impl_scalar!(f64, Float64);
 impl_scalar!(char, Char);
 impl_scalar!(bool, Bool);
 
-#[cfg(target_pointer_width = "32")] impl_scalar!(isize, Int32);
-#[cfg(target_pointer_width = "64")] impl_scalar!(isize, Int64);
+#[cfg(target_pointer_width = "32")]
+impl_scalar!(isize, Int32);
+#[cfg(target_pointer_width = "64")]
+impl_scalar!(isize, Int64);
 
-#[cfg(target_pointer_width = "32")] impl_scalar!(usize, UInt32);
-#[cfg(target_pointer_width = "64")] impl_scalar!(usize, UInt64);
+#[cfg(target_pointer_width = "32")]
+impl_scalar!(usize, UInt32);
+#[cfg(target_pointer_width = "64")]
+impl_scalar!(usize, UInt64);
 
 macro_rules! impl_array {
     ($($n:expr),*$(,)*) => {
@@ -210,7 +248,7 @@ macro_rules! impl_array {
 }
 
 // implement TypeInfo for fixed-size arrays of lengths 0..63
-impl_array!(
+impl_array! {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
     0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
@@ -219,7 +257,7 @@ impl_array!(
     0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
     0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
     0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f,
-);
+}
 
 macro_rules! impl_tuple {
     ($t:ident) => {
@@ -260,9 +298,7 @@ macro_rules! impl_tuple {
 }
 
 // implement TypeInfo for tuples of sizes 0..15
-impl_tuple!(
-    T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15
-);
+impl_tuple! { T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15 }
 
 /// Compound type constructor that implements [`TypeInfo`](trait.TypeInfo.html)
 /// trait automatically.
@@ -320,7 +356,22 @@ macro_rules! def {
         $($(#[$attr])* pub struct $s { $(pub $i: $t),+ } def!(@impl $s { $($i: $t),+ } );)*
     );
 
-    // implement TypeInfo trait
+    // private tuple struct, private fields
+    ($($(#[$attr:meta])* struct $s:ident ($($t:ty),+$(,)*))*) => (
+        $($(#[$attr])* struct $s ($($t),+) def!(@impl $s ($($t),+));)*
+    );
+
+    // public tuple struct, private fields
+    ($($(#[$attr:meta])* pub struct $s:ident ($($t:ty),+$(,)*))*) => (
+        $($(#[$attr])* pub struct $s ($($t),+) def!(@impl $s ($($t),+));)*
+    );
+
+    // public tuple struct, public fields
+    ($($(#[$attr:meta])* pub struct $s:ident ($(pub $t:ty),+$(,)*))*) => (
+        $($(#[$attr])* pub struct $s ($($t),+) def!(@impl $s ($($t),+));)*
+    );
+
+    // implement TypeInfo trait for structs
     (@impl $s:ident { $($i:ident: $t:ty),* }) => (
         impl $crate::TypeInfo for $s {
             #[allow(dead_code, unused_variables)]
@@ -329,6 +380,21 @@ macro_rules! def {
                     $crate::NamedField::new(
                         &<$t as $crate::TypeInfo>::type_info(),
                         stringify!($i),
+                        unsafe { &((*(0usize as *const $s)).$i) as *const _ as usize }
+                    )
+                ),*], ::std::mem::size_of::<$s>())
+            }
+        }
+    );
+
+    // implement TypeInfo trait for tuple structs
+    (@impl $s:ident $($t:ty),*) => (
+        impl $crate::TypeInfo for $s {
+            #[allow(dead_code, unused_variables)]
+            fn type_info() -> $crate::Type {
+                $crate::Type::Tuple(vec![$(
+                    $crate::Field::new(
+                        &<$t as $crate::TypeInfo>::type_info(),
                         unsafe { &((*(0usize as *const $s)).$i) as *const _ as usize }
                     )
                 ),*], ::std::mem::size_of::<$s>())
