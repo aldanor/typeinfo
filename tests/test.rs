@@ -90,15 +90,6 @@ fn test_compound_types() {
 }
 
 #[test]
-fn test_compound_copy_clone() {
-    def![#[derive(Clone, Copy)] struct X { a: char }];
-    let x = X { a: '0' };
-    let y = x;
-    assert_eq!(x.a, y.a);
-    assert_eq!(x.clone().a, y.clone().a);
-}
-
-#[test]
 fn test_struct_attributes() {
     def![#[derive(Clone, Copy)] struct X { a: i8, b: u64 }];
     def![#[repr(packed)] #[derive(Clone, Copy)] struct Y { a: i8, b: u64 }];
