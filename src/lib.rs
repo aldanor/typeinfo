@@ -173,7 +173,7 @@ pub struct Field {
 }
 
 impl Field {
-    pub fn new<S: Into<String>>(ty: &Type, offset: usize) -> Field {
+    pub fn new(ty: &Type, offset: usize) -> Field {
         Field {
             ty: ty.clone(),
             offset: offset,
