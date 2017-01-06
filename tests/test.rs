@@ -124,6 +124,18 @@ mod module {
         #[derive(Clone, Copy)] pub struct U;
     }
 
+    def! {
+        #[derive(Clone, Copy)] pub struct T1(i32, i32);
+    }
+
+    def! {
+        #[derive(Clone, Copy)] pub struct T2(pub i32, pub i32);
+    }
+
+    def! {
+        #[derive(Clone, Copy)] pub struct T3();
+    }
+
     pub mod multiple {
         def! {
             #[derive(Clone, Copy)] struct C { x: i32 }
@@ -145,13 +157,34 @@ mod module {
             #[derive(Clone, Copy)] pub struct W1;
             #[derive(Clone, Copy)] pub struct W2;
         }
+        def! {
+            #[derive(Clone, Copy)] struct T4(i32, i32);
+            #[derive(Clone, Copy)] struct T5(i32, i32)
+        }
+        def! {
+            #[derive(Clone, Copy)] pub struct T6(i32, i32);
+            #[derive(Clone, Copy)] pub struct T7(i32, i32)
+        }
+        def! {
+            #[derive(Clone, Copy)] pub struct T8(pub i32, pub i32);
+            #[derive(Clone, Copy)] pub struct T9(pub i32, pub i32);
+        }
+        def! {
+            #[derive(Clone, Copy)] struct T10();
+            #[derive(Clone, Copy)] struct T11()
+        }
+        def! {
+            #[derive(Clone, Copy)] pub struct T12();
+            #[derive(Clone, Copy)] pub struct T13();
+        }
     }
 }
 
 #[test]
 #[allow(unused_variables, unused_imports)]
 fn test_pub_structs_fields() {
-    use module::{A, B, U};
-    use module::multiple::{E, F, G, H, W1, W2};
-    let b = B { x: 1, y: 2 };
+    use module::{A, B, U, T1, T2, T3};
+    use module::multiple::{E, F, G, H, W1, W2, T6, T7, T8, T9, T12, T13};
+    let _ = B { x: 1, y: 2 };
+    let _ = T2(1, 2);
 }

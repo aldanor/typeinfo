@@ -293,46 +293,56 @@ impl_array! {
 macro_rules! def {
     // private unit struct
     ($($(#[$attr:meta])* struct $s:ident);+$(;)*) => (
-        $($(#[$attr])* struct $s; def!(@impl $s { });)*
+        $($(#[$attr])* struct $s; def!(@impl_struct $s { });)*
     );
 
     // public unit struct
     ($($(#[$attr:meta])* pub struct $s:ident);+$(;)*) => (
-        $($(#[$attr])* pub struct $s; def!(@impl $s { });)*
+        $($(#[$attr])* pub struct $s; def!(@impl_struct $s { });)*
     );
 
     // private struct, private fields
     ($($(#[$attr:meta])* struct $s:ident { $($i:ident: $t:ty),+$(,)* })*) => (
-        $($(#[$attr])* struct $s { $($i: $t),+ } def!(@impl $s { $($i: $t),+ } );)*
+        $($(#[$attr])* struct $s { $($i: $t),+ } def!(@impl_struct $s { $($i: $t),+ } );)*
     );
 
     // public struct, private fields
     ($($(#[$attr:meta])* pub struct $s:ident { $($i:ident: $t:ty),+$(,)* })*) => (
-        $($(#[$attr])* pub struct $s { $($i: $t),+ } def!(@impl $s { $($i: $t),+ } );)*
+        $($(#[$attr])* pub struct $s { $($i: $t),+ } def!(@impl_struct $s { $($i: $t),+ } );)*
     );
 
     // public struct, public fields
     ($($(#[$attr:meta])* pub struct $s:ident { $(pub $i:ident: $t:ty),+$(,)* })*) => (
-        $($(#[$attr])* pub struct $s { $(pub $i: $t),+ } def!(@impl $s { $($i: $t),+ } );)*
+        $($(#[$attr])* pub struct $s { $(pub $i: $t),+ } def!(@impl_struct $s { $($i: $t),+ } );)*
     );
 
     // private tuple struct, private fields
-    ($($(#[$attr:meta])* struct $s:ident ($($t:ty),+$(,)*))*) => (
-        $($(#[$attr])* struct $s ($($t),+); def!(@impl $s ($($t),+));)*
-    );
-
-    // public tuple struct, private fields
-    ($($(#[$attr:meta])* pub struct $s:ident ($($t:ty),+$(,)*))*) => (
-        $($(#[$attr])* pub struct $s ($($t),+); def!(@impl $s ($($t),+));)*
+    ($($(#[$attr:meta])* struct $s:ident ($($t:ty),+$(,)*));*$(;)*) => (
+        $($(#[$attr])* struct $s ($($t),+); def!(@impl_tuple $s ($($t),+));)*
     );
 
     // public tuple struct, public fields
-    ($($(#[$attr:meta])* pub struct $s:ident ($(pub $t:ty),+$(,)*))*) => (
-        $($(#[$attr])* pub struct $s ($($t),+); def!(@impl $s ($($t),+));)*
+    ($($(#[$attr:meta])* pub struct $s:ident ($(pub $t:ty),+$(,)*));*$(;)*) => (
+        $($(#[$attr])* pub struct $s ($(pub $t),+); def!(@impl_tuple $s ($($t),+));)*
+    );
+
+    // public tuple struct, private fields
+    ($($(#[$attr:meta])* pub struct $s:ident ($($t:ty),+$(,)*));*$(;)*) => (
+        $($(#[$attr])* pub struct $s ($($t),+); def!(@impl_tuple $s ($($t),+));)*
+    );
+
+    // private unit tuple struct
+    ($($(#[$attr:meta])* struct $s:ident ());+$(;)*) => (
+        $($(#[$attr])* struct $s(); def!(@impl_tuple $s);)*
+    );
+
+    // public unit tuple struct
+    ($($(#[$attr:meta])* pub struct $s:ident ());+$(;)*) => (
+        $($(#[$attr])* pub struct $s(); def!(@impl_tuple $s);)*
     );
 
     // implement TypeInfo trait for structs
-    (@impl $s:ident { $($i:ident: $t:ty),* }) => (
+    (@impl_struct $s:ident { $($i:ident: $t:ty),* }) => (
         impl $crate::TypeInfo for $s {
             #[allow(dead_code, unused_variables)]
             fn type_info() -> $crate::Type {
@@ -347,26 +357,26 @@ macro_rules! def {
         }
     );
 
-    (@replace $a:tt $b:tt) => ($b);
+    (@replace_with $a:tt $b:tt) => ($b);
 
-    (@tuple [$($s:ident)*] $origin:ident $fields:ident | $t:ty $(,$tt:ty)*) => (
-        let &$($s)*(.., ref f, $(def!(@replace $tt _),)*) = unsafe { &*$origin };
+    (@parse_tuple_fields [$($s:ident)*] $origin:ident $fields:ident | $t:ty $(,$tt:ty)*) => (
+        let &$($s)*(.., ref f, $(def!(@replace_with $tt _),)*) = unsafe { &*$origin };
         $fields.push($crate::Field::new(
             &<$t as $crate::TypeInfo>::type_info(),
             f as *const _ as usize));
-        def!(@tuple [$($s)*] $origin $fields | $($tt),*);
+        def!(@parse_tuple_fields [$($s)*] $origin $fields | $($tt),*);
     );
 
-    (@tuple [$($s:ident)*] $origin:ident $fields:ident |) => ();
+    (@parse_tuple_fields [$($s:ident)*] $origin:ident $fields:ident |) => ();
 
     // implement TypeInfo trait for tuple structs
-    (@impl $s:ident $($tt:ty),*) => (
+    (@impl_tuple $s:ident $($tt:ty),*) => (
         impl $crate::TypeInfo for $s {
-            #[allow(dead_code, unused_variables)]
+            #[allow(unused_variables, unused_mut)]
             fn type_info() -> $crate::Type {
                 let origin = 0usize as *const $s;
-                let mut fields = Vec::<Field>::new();
-                def!(@tuple [$s] origin fields | $($tt),*);
+                let mut fields = Vec::<$crate::Field>::new();
+                def!(@parse_tuple_fields [$s] origin fields | $($tt),*);
                 $crate::Type::Tuple(fields, ::std::mem::size_of::<$s>())
             }
         }
@@ -402,8 +412,8 @@ macro_rules! impl_tuple {
             #[allow(dead_code, unused_variables)]
             fn type_info() -> $crate::Type {
                 let origin = 0usize as *const ($t, $($tt),*);
-                let mut fields = Vec::<Field>::new();
-                def!(@tuple [] origin fields | $t, $($tt),*);
+                let mut fields = Vec::<$crate::Field>::new();
+                def!(@parse_tuple_fields [] origin fields | $t, $($tt),*);
                 $crate::Type::Tuple(fields, ::std::mem::size_of::<($t, $($tt),*)>())
             }
         }
