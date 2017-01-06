@@ -359,17 +359,17 @@ macro_rules! def {
 
     // private tuple struct, private fields
     ($($(#[$attr:meta])* struct $s:ident ($($t:ty),+$(,)*))*) => (
-        $($(#[$attr])* struct $s ($($t),+) def!(@impl $s ($($t),+));)*
+        $($(#[$attr])* struct $s ($($t),+); def!(@impl $s ($($t),+));)*
     );
 
     // public tuple struct, private fields
     ($($(#[$attr:meta])* pub struct $s:ident ($($t:ty),+$(,)*))*) => (
-        $($(#[$attr])* pub struct $s ($($t),+) def!(@impl $s ($($t),+));)*
+        $($(#[$attr])* pub struct $s ($($t),+); def!(@impl $s ($($t),+));)*
     );
 
     // public tuple struct, public fields
     ($($(#[$attr:meta])* pub struct $s:ident ($(pub $t:ty),+$(,)*))*) => (
-        $($(#[$attr])* pub struct $s ($($t),+) def!(@impl $s ($($t),+));)*
+        $($(#[$attr])* pub struct $s ($($t),+); def!(@impl $s ($($t),+));)*
     );
 
     // implement TypeInfo trait for structs
