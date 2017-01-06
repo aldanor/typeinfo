@@ -4,7 +4,7 @@ extern crate typeinfo;
 use std::mem;
 
 use typeinfo::Type::*;
-use typeinfo::{Type, TypeInfo, NamedField};
+use typeinfo::{Type, TypeInfo, Field, NamedField};
 
 #[test]
 fn test_scalar_types() {
@@ -51,15 +51,24 @@ fn test_array_types() {
 
 #[test]
 fn test_tuple_types() {
-    let ty = <(i8, u16) as TypeInfo>::type_info();
-    let size = mem::size_of::<(i8, u16)>();
-    assert_eq!(ty, Tuple(vec![Int8, UInt16], size));
+    let ty = <(i8, u32) as TypeInfo>::type_info();
+    let size = mem::size_of::<(i8, u32)>();
+    assert_eq!(ty, Tuple(vec![Field::new(&Int8, 0), Field::new(&UInt32, 4)], size));
     assert_eq!(ty.size(), size);
     assert!(ty.is_tuple());
 
     let ty = <() as TypeInfo>::type_info();
     assert_eq!(ty, Tuple(vec![], 0));
     assert_eq!(ty.size(), 0);
+    assert!(ty.is_tuple());
+
+    def![#[derive(Clone, Copy)] struct X(i32)];
+    let ty = X::type_info();
+    let size = mem::size_of::<X>();
+    assert_eq!(ty, Tuple(vec![
+        Field::new(&Int32, 0)
+    ], size));
+    assert_eq!(ty.size(), size);
     assert!(ty.is_tuple());
 }
 

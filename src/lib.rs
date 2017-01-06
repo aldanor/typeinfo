@@ -92,7 +92,7 @@ pub enum Type {
     /// compound type whose fields are POD
     Compound(Vec<NamedField>, usize),
     /// tuple or a tuple struct with POD elements
-    Tuple(Vec<Type>, usize),
+    Tuple(Vec<Field>, usize),
 }
 
 impl Type {
@@ -259,47 +259,6 @@ impl_array! {
     0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f,
 }
 
-macro_rules! impl_tuple {
-    ($t:ident) => {
-        impl<$t> $crate::TypeInfo for ($t,) where $t: $crate::TypeInfo {
-            #[inline(always)]
-            fn type_info() -> $crate::Type {
-                $crate::Type::Tuple(
-                    vec![<$t as $crate::TypeInfo>::type_info()],
-                    ::std::mem::size_of::<($t,)>()
-                )
-            }
-        }
-
-        impl $crate::TypeInfo for () {
-            #[inline(always)]
-            fn type_info() -> $crate::Type {
-                $crate::Type::Tuple(vec![], ::std::mem::size_of::<()>())
-            }
-        }
-    };
-
-    ($t:ident, $($tt:ident),*) => {
-        impl<$t, $($tt),*> $crate::TypeInfo for ($t, $($tt),*)
-        where $t: $crate::TypeInfo, $($tt: $crate::TypeInfo),* {
-            #[inline(always)]
-            fn type_info() -> $crate::Type {
-                $crate::Type::Tuple(
-                    vec![
-                        <$t as $crate::TypeInfo>::type_info(),
-                        $(<$tt as $crate::TypeInfo>::type_info()),*
-                    ], ::std::mem::size_of::<($t, $($tt),*)>()
-                )
-            }
-        }
-
-        impl_tuple!($($tt),*);
-    };
-}
-
-// implement TypeInfo for tuples of sizes 0..15
-impl_tuple! { T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15 }
-
 /// Compound type constructor that implements [`TypeInfo`](trait.TypeInfo.html)
 /// trait automatically.
 ///
@@ -388,18 +347,78 @@ macro_rules! def {
         }
     );
 
+    (@replace $a:tt $b:tt) => ($b);
+
+    (@tuple [$($s:ident)*] $origin:ident $offsets:ident $types:ident
+     | $t:ty $(,$tt:ty)*) => (
+        let &$($s)*($(def!(@replace $tt _),)* ref f, ..) = unsafe { &*$origin };
+        $offsets.insert(0, f as *const _ as usize);
+        $types.push(<$t as $crate::TypeInfo>::type_info());
+        def!(@tuple [$($s)*] $origin $offsets $types | $($tt),*);
+    );
+
+    (@tuple [$($s:ident)*] $origin:ident $offsets:ident $types:ident |) => ();
+
     // implement TypeInfo trait for tuple structs
-    (@impl $s:ident $($t:ty),*) => (
+    (@impl $s:ident $($tt:ty),*) => (
         impl $crate::TypeInfo for $s {
             #[allow(dead_code, unused_variables)]
             fn type_info() -> $crate::Type {
-                $crate::Type::Tuple(vec![$(
-                    $crate::Field::new(
-                        &<$t as $crate::TypeInfo>::type_info(),
-                        unsafe { &((*(0usize as *const $s)).$i) as *const _ as usize }
-                    )
-                ),*], ::std::mem::size_of::<$s>())
+                let origin = 0usize as *const $s;
+                let mut offsets: Vec<usize> = vec![];
+                let mut types: Vec<Type> = vec![];
+                def!(@tuple [$s] origin offsets types | $($tt),*);
+                $crate::Type::Tuple(
+                    offsets.iter().cloned().zip(types.iter().cloned())
+                        .map(|(o, ref t)| $crate::Field::new(t, o)).collect::<Vec<_>>(),
+                    ::std::mem::size_of::<$s>())
             }
         }
     );
 }
+
+macro_rules! impl_tuple {
+    ($t:ident) => {
+        impl<$t> $crate::TypeInfo for ($t,) where $t: $crate::TypeInfo {
+            #[inline(always)]
+            fn type_info() -> $crate::Type {
+                let origin = 0usize as *const ($t,);
+                let &(ref f,) = unsafe { &*origin };
+                $crate::Type::Tuple(
+                    vec![$crate::Field::new(
+                        &<$t as $crate::TypeInfo>::type_info(),
+                        f as *const _ as usize)],
+                    ::std::mem::size_of::<($t,)>())
+            }
+        }
+
+        impl $crate::TypeInfo for () {
+            #[inline(always)]
+            fn type_info() -> $crate::Type {
+                $crate::Type::Tuple(vec![], ::std::mem::size_of::<()>())
+            }
+        }
+    };
+
+    ($t:ident, $($tt:ident),*) => {
+        impl<$t, $($tt),*> $crate::TypeInfo for ($t, $($tt),*)
+        where $t: $crate::TypeInfo, $($tt: $crate::TypeInfo),* {
+            #[allow(dead_code, unused_variables)]
+            fn type_info() -> $crate::Type {
+                let origin = 0usize as *const ($t, $($tt),*);
+                let mut offsets: Vec<usize> = vec![];
+                let mut types: Vec<Type> = vec![];
+                def!(@tuple [] origin offsets types | $t, $($tt),*);
+                $crate::Type::Tuple(
+                    offsets.iter().cloned().zip(types.iter().cloned())
+                        .map(|(o, ref t)| $crate::Field::new(t, o)).collect::<Vec<_>>(),
+                    ::std::mem::size_of::<($t, $($tt),*)>())
+            }
+        }
+
+        impl_tuple!($($tt),*);
+    };
+}
+
+// implement TypeInfo for tuples of sizes 0..15
+impl_tuple! { T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15 }
