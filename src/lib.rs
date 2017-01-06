@@ -349,15 +349,15 @@ macro_rules! def {
 
     (@replace $a:tt $b:tt) => ($b);
 
-    (@tuple [$($s:ident)*] $origin:ident $offsets:ident $types:ident
-     | $t:ty $(,$tt:ty)*) => (
-        let &$($s)*($(def!(@replace $tt _),)* ref f, ..) = unsafe { &*$origin };
-        $offsets.insert(0, f as *const _ as usize);
-        $types.push(<$t as $crate::TypeInfo>::type_info());
-        def!(@tuple [$($s)*] $origin $offsets $types | $($tt),*);
+    (@tuple [$($s:ident)*] $origin:ident $fields:ident | $t:ty $(,$tt:ty)*) => (
+        let &$($s)*(.., ref f, $(def!(@replace $tt _),)*) = unsafe { &*$origin };
+        $fields.push($crate::Field::new(
+            &<$t as $crate::TypeInfo>::type_info(),
+            f as *const _ as usize));
+        def!(@tuple [$($s)*] $origin $fields | $($tt),*);
     );
 
-    (@tuple [$($s:ident)*] $origin:ident $offsets:ident $types:ident |) => ();
+    (@tuple [$($s:ident)*] $origin:ident $fields:ident |) => ();
 
     // implement TypeInfo trait for tuple structs
     (@impl $s:ident $($tt:ty),*) => (
@@ -365,13 +365,9 @@ macro_rules! def {
             #[allow(dead_code, unused_variables)]
             fn type_info() -> $crate::Type {
                 let origin = 0usize as *const $s;
-                let mut offsets: Vec<usize> = vec![];
-                let mut types: Vec<Type> = vec![];
-                def!(@tuple [$s] origin offsets types | $($tt),*);
-                $crate::Type::Tuple(
-                    offsets.iter().cloned().zip(types.iter().cloned())
-                        .map(|(o, ref t)| $crate::Field::new(t, o)).collect::<Vec<_>>(),
-                    ::std::mem::size_of::<$s>())
+                let mut fields = Vec::<Field>::new();
+                def!(@tuple [$s] origin fields | $($tt),*);
+                $crate::Type::Tuple(fields, ::std::mem::size_of::<$s>())
             }
         }
     );
@@ -406,13 +402,9 @@ macro_rules! impl_tuple {
             #[allow(dead_code, unused_variables)]
             fn type_info() -> $crate::Type {
                 let origin = 0usize as *const ($t, $($tt),*);
-                let mut offsets: Vec<usize> = vec![];
-                let mut types: Vec<Type> = vec![];
-                def!(@tuple [] origin offsets types | $t, $($tt),*);
-                $crate::Type::Tuple(
-                    offsets.iter().cloned().zip(types.iter().cloned())
-                        .map(|(o, ref t)| $crate::Field::new(t, o)).collect::<Vec<_>>(),
-                    ::std::mem::size_of::<($t, $($tt),*)>())
+                let mut fields = Vec::<Field>::new();
+                def!(@tuple [] origin fields | $t, $($tt),*);
+                $crate::Type::Tuple(fields, ::std::mem::size_of::<($t, $($tt),*)>())
             }
         }
 
