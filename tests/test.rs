@@ -7,37 +7,37 @@ use typeinfo::Type::*;
 use typeinfo::{Type, TypeInfo, Field, NamedField};
 
 #[test]
-fn test_scalar_types() {
-    fn check_scalar_type<T: TypeInfo>(ty: Type) {
+fn test_scalar() {
+    fn check_scalar<T: TypeInfo>(ty: Type) {
         assert_eq!(<T as TypeInfo>::type_info(), ty);
         assert_eq!(ty.size(), mem::size_of::<T>());
         assert!(ty.is_scalar());
     }
 
-    check_scalar_type::<i8>(Int8);
-    check_scalar_type::<i16>(Int16);
-    check_scalar_type::<i32>(Int32);
-    check_scalar_type::<i64>(Int64);
-    check_scalar_type::<u8>(UInt8);
-    check_scalar_type::<u16>(UInt16);
-    check_scalar_type::<u32>(UInt32);
-    check_scalar_type::<u64>(UInt64);
-    check_scalar_type::<f32>(Float32);
-    check_scalar_type::<f64>(Float64);
-    check_scalar_type::<bool>(Bool);
-    check_scalar_type::<char>(Char);
+    check_scalar::<i8>(Int8);
+    check_scalar::<i16>(Int16);
+    check_scalar::<i32>(Int32);
+    check_scalar::<i64>(Int64);
+    check_scalar::<u8>(UInt8);
+    check_scalar::<u16>(UInt16);
+    check_scalar::<u32>(UInt32);
+    check_scalar::<u64>(UInt64);
+    check_scalar::<f32>(Float32);
+    check_scalar::<f64>(Float64);
+    check_scalar::<bool>(Bool);
+    check_scalar::<char>(Char);
 
     if mem::size_of::<usize>() == 4 {
-        check_scalar_type::<isize>(Int32);
-        check_scalar_type::<usize>(UInt32);
+        check_scalar::<isize>(Int32);
+        check_scalar::<usize>(UInt32);
     } else {
-        check_scalar_type::<isize>(Int64);
-        check_scalar_type::<usize>(UInt64);
+        check_scalar::<isize>(Int64);
+        check_scalar::<usize>(UInt64);
     }
 }
 
 #[test]
-fn test_array_types() {
+fn test_array() {
     let ty = <[u16; 42] as TypeInfo>::type_info();
     assert_eq!(ty, Array(Box::new(UInt16), 42));
     assert_eq!(ty.size(), 2 * 42);
@@ -50,7 +50,7 @@ fn test_array_types() {
 }
 
 #[test]
-fn test_tuple_types() {
+fn test_tuple() {
     let ty = <(i8, u32) as TypeInfo>::type_info();
     let size = mem::size_of::<(i8, u32)>();
     assert_eq!(ty, Tuple(vec![Field::new(&Int8, 0), Field::new(&UInt32, 4)], size));
@@ -73,7 +73,7 @@ fn test_tuple_types() {
 }
 
 #[test]
-fn test_compound_types() {
+fn test_compound() {
     def![#[derive(Clone, Copy)] struct X { a: i32, }];
     let ty = X::type_info();
     assert_eq!(ty, Compound(vec![
@@ -99,7 +99,7 @@ fn test_compound_types() {
 }
 
 #[test]
-fn test_struct_attributes() {
+fn test_attributes() {
     def![#[derive(Clone, Copy)] struct X { a: i8, b: u64 }];
     def![#[repr(packed)] #[derive(Clone, Copy)] struct Y { a: i8, b: u64 }];
     assert!(X::type_info().size() > Y::type_info().size());
@@ -182,7 +182,7 @@ mod module {
 
 #[test]
 #[allow(unused_variables, unused_imports)]
-fn test_pub_structs_fields() {
+fn test_visibility() {
     use module::{A, B, U, T1, T2, T3};
     use module::multiple::{E, F, G, H, W1, W2, T6, T7, T8, T9, T12, T13};
     let _ = B { x: 1, y: 2 };
