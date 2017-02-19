@@ -61,14 +61,26 @@ fn test_tuple() {
     assert_eq!(ty, Tuple(vec![], 0));
     assert_eq!(ty.size(), 0);
     assert!(ty.is_tuple());
+}
 
-    def![#[derive(Clone, Copy)] struct X(i32)];
+#[test]
+fn test_tuple_struct() {
+    def![#[derive(Clone, Copy)] struct X(bool, i64)];
     let ty = X::type_info();
-    let size = mem::size_of::<X>();
-    assert_eq!(ty, Tuple(vec![
-        Field::new(&Int32, 0)
-    ], size));
-    assert_eq!(ty.size(), size);
+    assert_eq!(ty, Tuple(vec![Field::new(&Bool, 0), Field::new(&Int64, 8)], 16));
+    assert_eq!(ty.size(), 16);
+    assert!(ty.is_tuple());
+
+    def![#[repr(packed)] #[derive(Clone, Copy)] struct P(bool, i64)];
+    let ty = P::type_info();
+    assert_eq!(ty, Tuple(vec![Field::new(&Bool, 0), Field::new(&Int64, 1)], 9));
+    assert_eq!(ty.size(), 9);
+    assert!(ty.is_tuple());
+
+    def![#[derive(Clone, Copy)] struct Y()];
+    let ty = Y::type_info();
+    assert_eq!(ty, Tuple(vec![], 0));
+    assert_eq!(ty.size(), 0);
     assert!(ty.is_tuple());
 }
 
