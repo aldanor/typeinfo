@@ -318,17 +318,17 @@ macro_rules! def {
 
     // private tuple struct, private fields
     ($($(#[$attr:meta])* struct $s:ident ($($t:ty),+$(,)*));*$(;)*) => (
-        $($(#[$attr])* struct $s ($($t),+); def!(@impl_tuple $s ($($t),+));)*
+        $($(#[$attr])* struct $s ($($t),+); def!(@impl_tuple $s $($t),+);)*
     );
 
     // public tuple struct, public fields
     ($($(#[$attr:meta])* pub struct $s:ident ($(pub $t:ty),+$(,)*));*$(;)*) => (
-        $($(#[$attr])* pub struct $s ($(pub $t),+); def!(@impl_tuple $s ($($t),+));)*
+        $($(#[$attr])* pub struct $s ($(pub $t),+); def!(@impl_tuple $s $($t),+);)*
     );
 
     // public tuple struct, private fields
     ($($(#[$attr:meta])* pub struct $s:ident ($($t:ty),+$(,)*));*$(;)*) => (
-        $($(#[$attr])* pub struct $s ($($t),+); def!(@impl_tuple $s ($($t),+));)*
+        $($(#[$attr])* pub struct $s ($($t),+); def!(@impl_tuple $s $($t),+);)*
     );
 
     // private unit tuple struct
